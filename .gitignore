@@ -38,3 +38,10 @@ next-env.d.ts
 
 # reference captures (optional)
 _source-home.html
+
+# Local reference docs (planning, migration notes) — never commit
+/reference_docs/
+
+# Root README only; other markdown at repo root stays local
+/*.md
+!README.md
