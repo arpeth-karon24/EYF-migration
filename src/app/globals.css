@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@400;700;900&family=Open+Sans:wght@300;400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-poppins: 'Poppins', sans-serif;
+  --font-montserrat: 'Montserrat', sans-serif;
+  --font-open-sans: 'Open Sans', sans-serif;
+  --swiper-navigation-size: 44px;
+  --swiper-theme-color: #007aff;
+}
+
+html, body {
+  @apply overflow-x-hidden;
+  font-size: 14px;
+}
+
+body {
+  @apply bg-eyf-page font-opensans antialiased;
+  color: #64686d;
+  line-height: 1.8em !important;
+  background-color: #1c1c1c !important;
+}
+
+a {
+  color: #337ab7;
+  text-decoration: none;
+}
+
+a.logo {
+  color: #2c2c2c;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-poppins;
+}
+
+/* Swiper hero — match full-bleed banner height feel */
+.home-hero .swiper {
+  --eyf-hero-h: min(85vh, 820px);
+}
+
+.home-hero .swiper,
+.home-hero .swiper-slide {
+  min-height: var(--eyf-hero-h);
+}
+
+.home-hero .napae-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(-90deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
+  z-index: 1;
+}
+
+.home-hero .banner-caption {
+  position: relative;
+  z-index: 2;
+}
+
+/* Elementor-like heading rhythm */
+.eyf-prose h2 {
+  @apply font-montserrat font-bold text-white;
+}
+
+.eyf-prose h4 {
+  @apply font-montserrat font-semibold text-white;
+}
+
+/* WP Event Manager-ish form controls (dark theme) */
+.wpem-like-input,
+.wpem-like-select {
+  @apply w-full rounded border border-white/20 bg-black px-3 py-2 text-sm font-medium text-white outline-none;
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+.wpem-like-label {
+  @apply mb-1 block text-sm font-medium text-white;
+}
+
+/* Swiper controls — Circular backgrounds to match original site */
+.home-hero .swiper-button-next,
+.home-hero .swiper-button-prev {
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.4);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.home-hero .swiper-button-next::after,
+.home-hero .swiper-button-prev::after {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.home-hero .swiper-button-next:hover,
+.home-hero .swiper-button-prev:hover {
+  background: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+}
+
+.home-hero .swiper-pagination-bullet {
+  background: #ffffff;
+  opacity: 0.3;
+  width: 10px;
+  height: 10px;
+}
+
+.home-hero .swiper-pagination-bullet-active {
+  background: #ffffff;
+  opacity: 1;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.eyf-fade-in-down {
+  animation: fadeInDown 0.9s ease-out both;
+}

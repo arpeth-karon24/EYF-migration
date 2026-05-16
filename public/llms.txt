@@ -1,0 +1,33 @@
+# Engage Youth Foundation
+
+> Machine-readable site summary. Public content mirrors https://engage-youth.org.
+
+## Organization
+- Name: Engage Youth Foundation
+- Type: US 501(c)(3) nonprofit
+- Mission: Engage, empower, and mobilize youth through programs, mentorship, and community projects (Pacific Northwest focus).
+
+## Primary URLs
+- Home: /
+- About: /about-us
+- News & social: /news-and-social-media
+- Donation: /donation
+- Volunteer request: /request-for-volunteer
+- FAQ: /faq
+- Events (upcoming): /activities
+- Past events: /past-events
+- Volunteer with us: /volunteer-with-us
+- Contact: /contact-us
+- Privacy: /privacy-policy
+
+## Thematic pillars (homepage)
+- Ecological sustainability
+- Fighting homelessness
+- Food drives and distribution
+- Youth financial literacy
+
+## Contact
+- Use the Contact page form for inquiries: /contact-us
+
+## Technical
+- Stack: Next.js (App Router), TypeScript, Tailwind CSS, GSAP ScrollTrigger, Supabase, Sanity CMS, Cloudinary, Cloudflare Pages/Workers, Turnstile.

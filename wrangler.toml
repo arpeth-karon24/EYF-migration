@@ -1,0 +1,8 @@
+name = "engage-youth-web"
+compatibility_date = "2025-05-14"
+pages_build_output_dir = ".vercel/output/static"
+
+# Cloudflare Workers (API) live alongside Pages; bind in dashboard or add:
+# [[services]]
+# binding = "API"
+# service = "eyf-api-worker"

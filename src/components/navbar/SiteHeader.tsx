@@ -1,0 +1,154 @@
+"use client";
+
+import Link from "next/link";
+import Image from "next/image";
+import { useState } from "react";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import { cn } from "@/lib/cn";
+import { PRIMARY_NAV, VOLUNTEER_CTA } from "@/constants/navigation";
+import { SITE } from "@/constants/homeContent";
+
+export function SiteHeader() {
+  const [open, setOpen] = useState(false);
+  useBodyScrollLock(open);
+
+  return (
+    <header
+      id="masthead"
+      className="sticky top-0 z-50 bg-black"
+      role="banner"
+    >
+      <nav className="navbar relative bg-black" aria-label="Primary">
+        <div className="mx-auto flex w-full max-w-[1920px] items-center justify-between gap-10 px-5 py-4 sm:px-8 sm:py-5 navlg:gap-16 navlg:px-12 navlg:py-5 xl:px-20">
+          {/* Brand — full WP logo lockup (icon + Channelizing Freshness), left-aligned */}
+          <Link href="/" className="logo shrink-0" aria-label={SITE.name}>
+            <Image
+              src={SITE.logo}
+              alt={SITE.name}
+              width={900}
+              height={320}
+              className="h-auto w-auto max-h-[64px] sm:max-h-[80px] navlg:max-h-[120px] xl:max-h-[140px]"
+              sizes="(max-width: 1024px) 280px, 420px"
+              quality={95}
+              priority
+            />
+          </Link>
+
+          {/* Nav — right-aligned, matches engage-youth.org */}
+          <div className="flex shrink-0 items-center justify-end">
+            <ul
+              id="responsive-menu"
+              className="hidden items-center justify-end navlg:flex"
+            >
+              {PRIMARY_NAV.map((item) => (
+                <li key={item.label} className="group relative">
+                  <Link
+                    href={item.href}
+                    className="flex items-center whitespace-nowrap px-5 py-2 text-[13px] font-semibold uppercase tracking-wide text-[#777] transition-colors hover:bg-black hover:text-white"
+                  >
+                    {item.label}
+                    {item.children && item.children.length > 0 && (
+                      <svg
+                        className="ml-1 h-3 w-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    )}
+                  </Link>
+                  {item.children && item.children.length > 0 && (
+                    <ul className="invisible absolute right-0 top-full z-50 min-w-[260px] border border-black border-t-2 border-t-black bg-black py-1 opacity-0 transition-all group-hover:visible group-hover:opacity-100">
+                      {item.children.map((c) => (
+                        <li key={c.href + c.label}>
+                          <Link
+                            href={c.href}
+                            className="block border-b border-black px-4 py-2 text-xs uppercase tracking-wider text-white hover:bg-[#2a2a2a]"
+                          >
+                            {c.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))}
+              <li className="ml-2">
+                <Link
+                  href={VOLUNTEER_CTA.href}
+                  className={cn(
+                    "menu_custom_btn inline-flex items-center whitespace-nowrap rounded-[10px] border-0 bg-[#444444] px-4 py-[7px]",
+                    "text-[13px] font-bold uppercase tracking-wide text-white transition-colors hover:bg-[#1c1c1c]",
+                  )}
+                >
+                  {VOLUNTEER_CTA.label}
+                </Link>
+              </li>
+            </ul>
+
+            <button
+              type="button"
+              className="navlg:hidden rounded border border-white/20 px-3 py-2 text-white"
+              aria-expanded={open}
+              aria-controls="mobile-primary-nav"
+              onClick={() => setOpen((v) => !v)}
+            >
+              <span className="sr-only">Toggle menu</span>
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d={open ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="mobile-primary-nav"
+          className={cn(
+            "absolute left-0 right-0 top-full z-50 overflow-hidden border-t border-[#3b3844] bg-[#1F1D26] transition-all duration-300 navlg:hidden",
+            open ? "max-h-[100vh] opacity-100" : "pointer-events-none max-h-0 opacity-0",
+          )}
+        >
+          <div className="px-4 pb-10 pt-4">
+            {PRIMARY_NAV.map((item) => (
+              <div key={item.label} className="border-b border-[#3b3844]/50 last:border-0">
+                <Link
+                  href={item.href}
+                  className="block py-4 text-sm font-semibold uppercase tracking-widest text-[#B6B3C4] hover:text-white"
+                  onClick={() => setOpen(false)}
+                >
+                  {item.label}
+                </Link>
+                {item.children?.map((c) => (
+                  <Link
+                    key={c.href}
+                    href={c.href}
+                    className="block border-t border-[#3b3844]/30 py-3 pl-6 text-xs uppercase tracking-widest text-[#B6B3C4]/80 hover:text-white"
+                    onClick={() => setOpen(false)}
+                  >
+                    {c.label}
+                  </Link>
+                ))}
+              </div>
+            ))}
+            <div className="pt-6">
+              <Link
+                href={VOLUNTEER_CTA.href}
+                className="block rounded-[10px] bg-[#444444] py-4 text-center text-xs font-bold uppercase tracking-[0.15em] text-white hover:bg-[#1c1c1c]"
+                onClick={() => setOpen(false)}
+              >
+                {VOLUNTEER_CTA.label}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+  );
+}

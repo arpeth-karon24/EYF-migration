@@ -1,0 +1,8 @@
+# Netlify / Cloudflare Pages static redirects (trailing slashes match next.config trailingSlash)
+/donate /donation/ 301
+/blog /news-and-social-media/ 301
+/activities /events/ 301
+/past-events /events/ 301
+/news-and-social-media/post-1 /news-and-social-media/child-rights-and-you-blog/ 301
+/news-and-social-media/post-2 /news-and-social-media/akshaya-patra-blog/ 301
+/news-and-social-media/post-3 /news-and-social-media/narayan-seva-sansthan/ 301

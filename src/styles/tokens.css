@@ -1,0 +1,10 @@
+/**
+ * Shared CSS variables aligned with the WordPress / Kirki theme tokens.
+ * Imported from `src/app/globals.css`.
+ */
+:root {
+  --eyf-gold: #e0be53;
+  --eyf-footer: #1f2024;
+  --eyf-page: #1c1c1c;
+  --eyf-accent-blue: #0088cc;
+}
