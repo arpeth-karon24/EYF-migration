@@ -1,8 +1,10 @@
 name = "engage-youth-web"
 compatibility_date = "2025-05-14"
-pages_build_output_dir = ".vercel/output/static"
+pages_build_output_dir = "out"
 
-# Cloudflare Workers (API) live alongside Pages; bind in dashboard or add:
-# [[services]]
-# binding = "API"
-# service = "eyf-api-worker"
+# Environment variables bound to Cloudflare Pages Functions
+[env.production]
+vars = { ADMIN_EMAIL = "arpeth.karon@innovinlabs.com" }
+
+[env.preview]
+vars = { ADMIN_EMAIL = "arpeth.karon@innovinlabs.com" }
