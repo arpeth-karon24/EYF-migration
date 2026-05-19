@@ -74,10 +74,15 @@ export async function getAllPostSlugs(): Promise<string[]> {
 
 export async function getUpcomingEvents(): Promise<SanityEvent[]> {
   const client = getSanityClient();
-  if (!client) return [];
-  return client.fetch<SanityEvent[]>(
+  if (!client) {
+    console.log('[Sanity] No client — NEXT_PUBLIC_SANITY_PROJECT_ID missing');
+    return [];
+  }
+  const results = await client.fetch<SanityEvent[]>(
     `*[_type == "event" && status == "upcoming"] | order(startDate asc) { ${EVENT_FIELDS} }`
   );
+  console.log(`[Sanity] getUpcomingEvents → ${results.length} events found`);
+  return results;
 }
 
 export async function getPastEvents(): Promise<SanityEvent[]> {
