@@ -2,18 +2,41 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PortableText } from "@portabletext/react";
 import { InternalPageShell } from "@/components/layout/InternalPageShell";
 import { HeroSection } from "@/components/sections";
 import { BLOG_POSTS, getBlogPostBySlug } from "@/constants/blogContent";
+import { getPostBySlug, getAllPostSlugs } from "@/sanity/queries";
+import { urlFor } from "@/sanity/client";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
-  return BLOG_POSTS.map((post) => ({ slug: post.slug }));
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+export async function generateStaticParams() {
+  const sanitySlugs = await getAllPostSlugs();
+  const staticSlugs = BLOG_POSTS.map((p) => p.slug);
+  // Merge and deduplicate
+  const all = new Set<string>([...staticSlugs, ...sanitySlugs]);
+  return Array.from(all).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const sanityPost = await getPostBySlug(slug);
+  if (sanityPost) {
+    return {
+      title: `${sanityPost.title} | Engage Youth Foundation`,
+      description: sanityPost.excerpt,
+      alternates: { canonical: `/news-and-social-media/${sanityPost.slug}` },
+    };
+  }
   const post = getBlogPostBySlug(slug);
   if (!post) return { title: "News" };
   return {
@@ -25,6 +48,85 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function NewsArticlePage({ params }: Props) {
   const { slug } = await params;
+
+  // ── Sanity content ──────────────────────────────────────────────────────────
+  const sanityPost = await getPostBySlug(slug);
+
+  if (sanityPost) {
+    const imageUrl = sanityPost.mainImage ? urlFor(sanityPost.mainImage) : null;
+
+    return (
+      <InternalPageShell>
+        <HeroSection title={sanityPost.title} variant="internal" className="bg-transparent" />
+
+        <article className="pb-16 pt-4 md:pb-24">
+          <div className="mx-auto max-w-container px-4">
+            <Link
+              href="/news-and-social-media"
+              className="mb-8 inline-block font-opensans text-sm text-eyf-gold underline-offset-4 hover:underline"
+            >
+              ← Back to News and Social Media
+            </Link>
+
+            <div className="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-[#1c1c1c]/80 shadow-xl backdrop-blur-md">
+              {imageUrl && (
+                <div className="relative aspect-[16/9] w-full">
+                  <Image
+                    src={imageUrl}
+                    alt={sanityPost.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 896px"
+                    priority
+                  />
+                </div>
+              )}
+
+              <div className="p-8 md:p-10">
+                <div className="mb-6 flex flex-wrap items-center gap-3 font-poppins text-[11px] font-bold uppercase tracking-widest text-eyf-gold">
+                  <span>{sanityPost.category}</span>
+                  <span className="text-white/20">|</span>
+                  <span className="text-white/60">{formatDate(sanityPost.publishedAt)}</span>
+                </div>
+
+                {sanityPost.location && (
+                  <p className="mb-8 flex items-center font-opensans text-sm text-white/50">
+                    <span className="mr-2">📍</span> {sanityPost.location}
+                  </p>
+                )}
+
+                {sanityPost.body ? (
+                  <div className="prose prose-invert max-w-none prose-p:font-opensans prose-p:text-[15px] prose-p:leading-relaxed prose-p:text-white/85 prose-headings:font-montserrat prose-headings:text-white prose-a:text-eyf-gold prose-strong:text-white">
+                    <PortableText value={sanityPost.body} />
+                  </div>
+                ) : (
+                  <p className="font-opensans text-[15px] leading-relaxed text-white/85">
+                    {sanityPost.excerpt}
+                  </p>
+                )}
+
+                {sanityPost.sourceUrl && (
+                  <p className="mt-10 border-t border-white/10 pt-8 font-opensans text-sm text-white/50">
+                    First published on the Engage Youth Foundation website.{" "}
+                    <a
+                      href={sanityPost.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-eyf-gold underline-offset-2 hover:underline"
+                    >
+                      View original post
+                    </a>
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </article>
+      </InternalPageShell>
+    );
+  }
+
+  // ── Static fallback ─────────────────────────────────────────────────────────
   const post = getBlogPostBySlug(slug);
   if (!post) notFound();
 

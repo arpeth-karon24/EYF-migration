@@ -1,6 +1,31 @@
-import { EVENT_CATEGORIES, EVENT_TYPES } from "@/constants/eventFilters";
+'use client';
 
-export function HomeEventsSection() {
+import Image from "next/image";
+import Link from "next/link";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import { EVENT_CATEGORIES, EVENT_TYPES } from "@/constants/eventFilters";
+import type { SanityEvent } from "@/sanity/types";
+import { urlFor } from "@/sanity/client";
+
+function formatEventDate(start: string, end?: string): string {
+  const s = new Date(start).toLocaleDateString("en-US", {
+    month: "short", day: "numeric", year: "numeric",
+  });
+  if (!end) return s;
+  const e = new Date(end).toLocaleDateString("en-US", {
+    month: "short", day: "numeric", year: "numeric",
+  });
+  return s === e ? s : `${s} – ${e}`;
+}
+
+interface Props {
+  upcomingEvents: SanityEvent[];
+}
+
+export function HomeEventsSection({ upcomingEvents }: Props) {
   return (
     <section className="bg-eyf-page py-16 lg:py-24" aria-labelledby="choose-events-heading">
       <div className="mx-auto max-w-container px-4">
@@ -9,7 +34,9 @@ export function HomeEventsSection() {
             Choose Events
           </h2>
         </div>
+
         <div className="mx-auto max-w-5xl">
+          {/* Filter form */}
           <form className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" action="#" method="get" role="search">
             <div className="flex flex-col gap-1">
               <input
@@ -43,13 +70,11 @@ export function HomeEventsSection() {
               <select
                 id="search_categories"
                 name="search_categories"
-                className="w-full rounded border border-white/20 bg-white px-4 py-3 text-[13px] text-gray-700 outline-none transition-all focus:border-eyf-gold appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23999999%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_1rem_center] bg-no-repeat"
+                className="w-full appearance-none rounded border border-white/20 bg-white px-4 py-3 text-[13px] text-gray-700 outline-none transition-all focus:border-eyf-gold"
               >
                 <option value="">Choose an Event Category</option>
                 {EVENT_CATEGORIES.map((o) => (
-                  <option key={o.label} value={o.value}>
-                    {o.label}
-                  </option>
+                  <option key={o.label} value={o.value}>{o.label}</option>
                 ))}
               </select>
             </div>
@@ -57,21 +82,110 @@ export function HomeEventsSection() {
               <select
                 id="search_event_types"
                 name="search_event_types"
-                className="w-full rounded border border-white/20 bg-white px-4 py-3 text-[13px] text-gray-700 outline-none transition-all focus:border-eyf-gold appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23999999%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_1rem_center] bg-no-repeat"
+                className="w-full appearance-none rounded border border-white/20 bg-white px-4 py-3 text-[13px] text-gray-700 outline-none transition-all focus:border-eyf-gold"
               >
                 <option value="">Choose an Event Type</option>
                 {EVENT_TYPES.map((o) => (
-                  <option key={o.label} value={o.value}>
-                    {o.label}
-                  </option>
+                  <option key={o.label} value={o.value}>{o.label}</option>
                 ))}
               </select>
             </div>
           </form>
-          
-          <div className="mt-12 rounded-lg border border-[#f5c6cb] bg-[#f8d7da] px-6 py-4 text-center text-[13px] font-normal text-[#721c24]">
-            There are currently no events.
-          </div>
+
+          {/* Events slider or empty state */}
+          {upcomingEvents.length > 0 ? (
+            <div className="mt-12">
+              <Swiper
+                modules={[Navigation, Autoplay]}
+                navigation
+                autoplay={{ delay: 4000, disableOnInteraction: false }}
+                loop={upcomingEvents.length > 2}
+                spaceBetween={24}
+                slidesPerView={1}
+                breakpoints={{
+                  640:  { slidesPerView: 2 },
+                  1024: { slidesPerView: 3 },
+                }}
+                className="w-full pb-4"
+              >
+                {upcomingEvents.map((event) => {
+                  const imageUrl = event.mainImage ? urlFor(event.mainImage) : null;
+                  return (
+                    <SwiperSlide key={event._id}>
+                      <article className="group overflow-hidden rounded-xl border border-white/10 bg-[#1c1c1c]/80 shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-2xl h-full">
+                        {imageUrl ? (
+                          <div className="relative h-40 w-full overflow-hidden">
+                            <Image
+                              src={imageUrl}
+                              alt={event.title}
+                              fill
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                              sizes="(max-width: 640px) 100vw, 33vw"
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex h-40 w-full items-center justify-center bg-gradient-to-br from-[#2c2c2c] to-[#1a1a1a]">
+                            <svg className="h-12 w-12 opacity-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                        )}
+                        <div className="p-4">
+                          {event.category && (
+                            <p className="mb-1 font-poppins text-[10px] font-bold uppercase tracking-widest text-eyf-gold">
+                              {event.category}
+                            </p>
+                          )}
+                          <h3 className="mb-2 font-montserrat text-sm font-bold leading-snug text-white transition-colors group-hover:text-eyf-gold">
+                            {event.title}
+                          </h3>
+                          <p className="mb-1 flex items-center gap-1 font-opensans text-[11px] text-white/50">
+                            <span>📅</span>
+                            <span>{formatEventDate(event.startDate, event.endDate)}</span>
+                          </p>
+                          <p className="mb-3 flex items-center gap-1 font-opensans text-[11px] text-white/50">
+                            <span>📍</span>
+                            <span>{event.location}</span>
+                          </p>
+                          {event.registrationUrl ? (
+                            <a
+                              href={event.registrationUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-block rounded bg-eyf-gold px-3 py-1.5 font-poppins text-[10px] font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-80"
+                            >
+                              Register
+                            </a>
+                          ) : (
+                            <Link
+                              href="/events"
+                              className="font-poppins text-[10px] font-bold uppercase tracking-widest text-white/60 transition-colors hover:text-white"
+                            >
+                              View Details →
+                            </Link>
+                          )}
+                        </div>
+                      </article>
+                    </SwiperSlide>
+                  );
+                })}
+              </Swiper>
+
+              <div className="mt-8 text-center">
+                <Link
+                  href="/events"
+                  className="inline-block rounded-full border border-eyf-gold px-8 py-3 font-poppins text-xs font-bold uppercase tracking-widest text-eyf-gold transition-all hover:bg-eyf-gold hover:text-black"
+                >
+                  View All Events
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-12 rounded-lg border border-[#f5c6cb] bg-[#f8d7da] px-6 py-4 text-center text-[13px] font-normal text-[#721c24]">
+              There are currently no events.
+            </div>
+          )}
         </div>
       </div>
     </section>
