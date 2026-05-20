@@ -1,52 +1,66 @@
 /**
  * Newsletter Subscription Email Templates
- * User confirmation and admin notification emails
+ * User welcome + admin notification.
  */
 
-import { baseEmailTemplate, createParagraph, createHighlight, createButton } from './baseTemplate';
+import {
+  baseEmailTemplate,
+  createInfoBlock,
+  createParagraph,
+  createHighlight,
+  createButton,
+  createDivider,
+} from './baseTemplate';
 
 /**
- * User confirmation email - Newsletter Subscription
+ * User confirmation / welcome email.
  */
 export function newsletterUserEmail(email: string): string {
   const content = `
-    <h2>Welcome to Our Newsletter!</h2>
-    ${createParagraph('Thank you for subscribing to the Engage Youth Fund newsletter!')}
-    ${createHighlight('You will now receive updates about our programs, volunteer opportunities, events, and impact stories directly in your inbox.')}
-    ${createParagraph('We are committed to keeping you informed about our mission to empower youth and build futures. Expect to hear from us regularly with inspiring stories and ways you can get involved.')}
+    <h2>Welcome to the EYF community 🌱</h2>
+    ${createParagraph(
+      `You're now subscribed to the Engage Youth Foundation newsletter. We'll keep you in the loop on programs, volunteer opportunities, events, and the stories of the youth we serve.`
+    )}
+
+    ${createHighlight('Expect occasional emails — no spam, no daily blasts. Just meaningful updates from a community working to empower the next generation.')}
+
+    ${createInfoBlock('Subscribed email', email)}
+
+    ${createDivider()}
+
+    ${createParagraph('Want to start exploring now?')}
     ${createButton('Visit Our Website', 'https://engage-youth.org')}
-    ${createParagraph('If you ever wish to unsubscribe, simply click the unsubscribe link at the bottom of any newsletter email.')}
-    ${createParagraph('Thank you for your support,<br>The Engage Youth Fund Team')}
+
+    ${createParagraph(
+      `You can unsubscribe anytime using the link at the bottom of any newsletter we send.<br><br>Thanks for joining us,<br><strong>The Engage Youth Foundation Team</strong>`,
+      true
+    )}
   `;
 
   return baseEmailTemplate({
     content,
-    title: 'Newsletter Subscription Confirmed',
-    preheader: 'Welcome to EYF Newsletter',
+    title: 'Welcome to the EYF newsletter',
+    preheader: 'Thanks for subscribing — here\'s what to expect.',
   });
 }
 
 /**
- * Admin notification email - Newsletter Subscription
+ * Admin notification email — sent to the EYF inbox.
  */
 export function newsletterAdminEmail(email: string, submittedAt: string): string {
   const content = `
-    <h2>New Newsletter Subscriber</h2>
-    ${createParagraph('A new subscriber has joined your mailing list.')}
-    <div class="info-block">
-      <strong>Email:</strong>
-      <span>${email}</span>
-    </div>
-    <div class="info-block">
-      <strong>Subscribed At:</strong>
-      <span>${submittedAt}</span>
-    </div>
-    ${createParagraph('This subscriber has opted in to receive newsletter updates. Remember to comply with email marketing best practices and regulations.')}
+    <h2>New newsletter subscriber</h2>
+    ${createParagraph('A new visitor has joined the newsletter list.')}
+
+    ${createInfoBlock('Email', email)}
+    ${createInfoBlock('Subscribed at', submittedAt)}
+
+    ${createParagraph('This subscriber has opted in via the website. Add them to your mailing tool of choice and remember to honor any unsubscribe requests promptly.')}
   `;
 
   return baseEmailTemplate({
     content,
-    title: 'New Newsletter Subscriber - Admin Notification',
+    title: 'New newsletter subscriber',
     preheader: `New subscriber: ${email}`,
   });
 }

@@ -70,6 +70,30 @@ export function useFormSubmission(options: UseFormSubmissionOptions) {
           body: JSON.stringify(requestBody),
         });
 
+        // Guard: if the endpoint isn't a Cloudflare Function (e.g. running
+        // `npm run dev` instead of `wrangler pages dev`), the server returns
+        // an HTML 404 page. Parsing that as JSON throws an opaque
+        // "Unexpected token '<'" error. Detect and message clearly instead.
+        const contentType = response.headers.get('content-type') ?? '';
+        if (!contentType.includes('application/json')) {
+          const isLocalDev =
+            typeof window !== 'undefined' &&
+            (window.location.hostname === 'localhost' ||
+              window.location.hostname === '127.0.0.1');
+
+          const friendlyMessage = isLocalDev
+            ? 'Forms only work on the deployed site, not on localhost. Either submit this form on https://engage-youth-web.pages.dev, or run `npx wrangler pages dev out` locally.'
+            : `The form endpoint is not responding correctly (status ${response.status}). Please try again later or contact admin@engage-youth.org.`;
+
+          setState({
+            isLoading: false,
+            message: { type: 'error', text: friendlyMessage },
+            errors: [],
+          });
+          onError?.(friendlyMessage);
+          return false;
+        }
+
         const data: FormSubmissionResponse = await response.json();
 
         if (!response.ok) {

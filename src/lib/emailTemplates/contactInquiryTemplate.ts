@@ -1,34 +1,49 @@
 /**
  * Contact Inquiry Email Templates
- * User confirmation and admin notification emails
+ * User confirmation + admin notification.
  */
 
-import { baseEmailTemplate, createInfoBlock, createParagraph, createHighlight } from './baseTemplate';
+import {
+  baseEmailTemplate,
+  createInfoBlock,
+  createParagraph,
+  createHighlight,
+  createButton,
+  createDivider,
+} from './baseTemplate';
 
 /**
- * User confirmation email - Contact Form
+ * User confirmation email — sent to the person who filled the form.
  */
 export function contactInquiryUserEmail(name: string, email: string): string {
   const content = `
-    <h2>Thank You for Contacting Us</h2>
-    ${createParagraph(`Hello ${name},`)}
-    ${createParagraph('We have received your inquiry and appreciate you taking the time to reach out to Engage Youth Fund. Your message is important to us.')}
-    ${createHighlight('Your inquiry has been submitted and our team will review it shortly. We typically respond within 1-2 business days.')}
-    ${createInfoBlock('Your Email', email)}
-    ${createParagraph('If you have any additional questions or information to share, feel free to reply to this email or contact us directly at admin@engage-youth.org')}
-    ${createParagraph('Thank you for your interest in supporting youth empowerment!')}
-    ${createParagraph('Best regards,<br>The Engage Youth Fund Team')}
+    <h2>Thank you for reaching out, ${name}</h2>
+    ${createParagraph(`We've received your message and a member of the Engage Youth Foundation team will get back to you within 1–2 business days.`)}
+    ${createHighlight('Your inquiry is in good hands. We review every message personally — no auto-replies after this one.')}
+
+    ${createInfoBlock('Submitted by', name)}
+    ${createInfoBlock('Reply will be sent to', email)}
+
+    ${createDivider()}
+
+    ${createParagraph('In the meantime, feel free to explore our work or get involved:')}
+    ${createButton('Visit Our Website', 'https://engage-youth.org')}
+
+    ${createParagraph(
+      `If you have anything else to add, just reply to this email — it goes straight to our team.<br><br>Warm regards,<br><strong>The Engage Youth Foundation Team</strong>`,
+      true
+    )}
   `;
 
   return baseEmailTemplate({
     content,
-    title: 'Contact Inquiry Received',
-    preheader: 'Thank you for contacting Engage Youth Fund',
+    title: 'We received your message',
+    preheader: `Thanks ${name} — we'll be in touch shortly.`,
   });
 }
 
 /**
- * Admin notification email - Contact Form
+ * Admin notification email — sent to the EYF inbox.
  */
 export function contactInquiryAdminEmail(
   name: string,
@@ -37,21 +52,29 @@ export function contactInquiryAdminEmail(
   message: string,
   submittedAt: string
 ): string {
+  const truncated = message.length > 500 ? `${message.substring(0, 500)}…` : message;
+
   const content = `
-    <h2>New Contact Inquiry Received</h2>
-    ${createParagraph('A new contact inquiry has been submitted through the website.')}
+    <h2>New contact inquiry</h2>
+    ${createParagraph('A new contact form submission has come in from the website.')}
+
     ${createInfoBlock('Name', name)}
     ${createInfoBlock('Email', email)}
     ${createInfoBlock('Subject', subject)}
-    ${createInfoBlock('Message', message.substring(0, 500) + (message.length > 500 ? '...' : ''))}
-    ${createInfoBlock('Submitted At', submittedAt)}
-    ${createHighlight(`<a href="mailto:${email}?subject=Re: ${encodeURIComponent(subject)}">Reply to ${name}</a>`)}
-    ${createParagraph('This is an automated notification. Please handle this inquiry according to your standard procedures.')}
+    ${createInfoBlock('Message', truncated)}
+    ${createInfoBlock('Submitted at', submittedAt)}
+
+    ${createHighlight(
+      `<a href="mailto:${email}?subject=Re:%20${encodeURIComponent(subject)}">→ Reply to ${name} directly</a>`,
+      true
+    )}
+
+    ${createParagraph('This is an automated notification from the website contact form.')}
   `;
 
   return baseEmailTemplate({
     content,
-    title: 'New Contact Inquiry - Admin Notification',
-    preheader: `New inquiry from ${name}`,
+    title: `New inquiry — ${subject}`,
+    preheader: `New contact inquiry from ${name}`,
   });
 }

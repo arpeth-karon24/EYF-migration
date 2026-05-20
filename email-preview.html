@@ -1,43 +1,4 @@
-/**
- * Base Email Template
- * Professional, branded HTML email layout for all EYF transactional emails.
- *
- * Design notes:
- * - Built with <table>-based layout for maximum email-client compatibility
- *   (Outlook, Gmail, Apple Mail, Yahoo all render this consistently).
- * - All styling is inline or in <head> with web-safe fonts as fallbacks.
- * - Header mirrors the website nav: logo on the left + brand name + tagline.
- * - Gold accent bar matches the site's eyf-gold (#e0be53).
- * - Dark sections (#1c1c1c / #1f2024) match the live site.
- */
-
-const LOGO_URL =
-  'https://engage-youth.org/wp-content/uploads/2024/03/eyf-logo-2.png';
-const SITE_URL = 'https://engage-youth.org';
-const SUPPORT_EMAIL = 'admin@engage-youth.org';
-const BRAND_NAME = 'Engage Youth Foundation';
-const BRAND_TAGLINE = 'Channelizing Freshness to the Community';
-const COPYRIGHT_YEAR = new Date().getFullYear();
-
-export interface EmailTemplateProps {
-  content: string;
-  title?: string;
-  preheader?: string;
-  footerText?: string;
-}
-
-/**
- * Generate the full HTML email document.
- */
-export function baseEmailTemplate(props: EmailTemplateProps): string {
-  const {
-    content,
-    title = BRAND_NAME,
-    preheader = '',
-    footerText = `© ${COPYRIGHT_YEAR} ${BRAND_NAME}. All rights reserved.`,
-  } = props;
-
-  return `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="UTF-8" />
@@ -45,15 +6,13 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="color-scheme" content="light only" />
   <meta name="supported-color-schemes" content="light" />
-  <title>${title}</title>
+  <title>EYF Email Preview</title>
   <style>
-    /* Reset */
     body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
     table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
     img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
     body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
 
-    /* Base */
     body {
       background-color: #eef0f4;
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -61,7 +20,6 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
     }
     a { color: #1f6feb; text-decoration: none; }
 
-    /* Header — full WP-style logo lockup (matches site nav header) */
     .brand-name {
       font-family: 'Poppins', 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 26px;
@@ -81,7 +39,6 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
       margin: 8px 0 0 0;
     }
 
-    /* Content typography */
     .content h2 {
       font-family: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 22px;
@@ -98,7 +55,6 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
     }
     .content strong { color: #1c1c1c; }
 
-    /* Reusable blocks */
     .highlight {
       background-color: #fbf6e8;
       border-left: 4px solid #e0be53;
@@ -153,7 +109,6 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
 
     .divider { border-top: 1px solid #e8eaee; margin: 24px 0; height: 1px; }
 
-    /* Footer */
     .footer-text {
       font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-size: 12px;
@@ -162,9 +117,7 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
       margin: 0;
     }
     .footer-link { color: #e0be53 !important; text-decoration: none; }
-    .footer-link:hover { text-decoration: underline; }
 
-    /* Responsive */
     @media only screen and (max-width: 620px) {
       .container { width: 100% !important; }
       .px { padding-left: 22px !important; padding-right: 22px !important; }
@@ -178,136 +131,84 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
 </head>
 <body style="margin:0; padding:0; background-color:#eef0f4;">
 
-  <!-- Hidden preheader (preview text in inbox list) -->
-  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#eef0f4;">
-    ${escapeHtml(preheader)}
-  </div>
-
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#eef0f4">
     <tr>
       <td align="center" style="padding: 30px 12px;">
 
-        <!-- Email container -->
         <table role="presentation" class="container" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:10px; overflow:hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
 
-          <!-- ── HEADER ─────────────────────────────────────────── -->
-          <!-- Full WP-style logo lockup on dark nav background, matching the live site header -->
+          <!-- HEADER -->
           <tr>
             <td bgcolor="#1c1c1c" style="background-color:#1c1c1c; padding: 28px 32px;" class="px">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
                   <td valign="middle" width="140" class="header-logo-cell" style="width:140px;">
-                    <img src="${LOGO_URL}"
-                         alt="${BRAND_NAME} — ${BRAND_TAGLINE}"
+                    <img src="https://engage-youth.org/wp-content/uploads/2024/03/eyf-logo-2.png"
+                         alt="Engage Youth Foundation — Channelizing Freshness to the Community"
                          width="120"
                          class="header-logo"
                          style="display:block; width:120px; height:auto; max-width:120px; border:0; outline:none;" />
                   </td>
                   <td valign="middle" style="padding-left:20px;">
-                    <p class="brand-name">${BRAND_NAME}</p>
-                    <p class="brand-tagline">${BRAND_TAGLINE}</p>
+                    <p class="brand-name">Engage Youth Foundation</p>
+                    <p class="brand-tagline">Channelizing Freshness to the Community</p>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- Gold accent bar -->
           <tr>
             <td bgcolor="#e0be53" style="background-color:#e0be53; height:4px; line-height:4px; font-size:4px;">&nbsp;</td>
           </tr>
 
-          <!-- ── CONTENT ────────────────────────────────────────── -->
+          <!-- SAMPLE CONTENT -->
           <tr>
             <td class="content px" style="padding: 36px 40px 28px 40px;">
-              ${content}
+              <h2>Thank you for reaching out, Arpeth</h2>
+              <p>We've received your message and a member of the Engage Youth Foundation team will get back to you within 1–2 business days.</p>
+              <div class="highlight">
+                <p>Your inquiry is in good hands. We review every message personally — no auto-replies after this one.</p>
+              </div>
+              <div class="info-block">
+                <span class="label">Submitted by</span>
+                <span class="value">Arpeth Karon</span>
+              </div>
+              <div class="info-block">
+                <span class="label">Reply will be sent to</span>
+                <span class="value">arpeth@example.com</span>
+              </div>
+              <div class="divider"></div>
+              <p>In the meantime, feel free to explore our work or get involved:</p>
+              <div class="btn-wrap">
+                <a href="https://engage-youth.org" class="btn" style="color:#1c1c1c;">Visit Our Website</a>
+              </div>
+              <p>If you have anything else to add, just reply to this email — it goes straight to our team.<br><br>Warm regards,<br><strong>The Engage Youth Foundation Team</strong></p>
             </td>
           </tr>
 
-          <!-- ── FOOTER ─────────────────────────────────────────── -->
+          <!-- FOOTER -->
           <tr>
             <td bgcolor="#1f2024" style="background-color:#1f2024; padding: 28px 36px;" class="px" align="center">
-              <p class="footer-text" style="margin-bottom:10px;">${escapeHtml(footerText)}</p>
+              <p class="footer-text" style="margin-bottom:10px;">© 2026 Engage Youth Foundation. All rights reserved.</p>
               <p class="footer-text">
-                <a class="footer-link" href="${SITE_URL}" style="color:#e0be53;">Website</a>
+                <a class="footer-link" href="https://engage-youth.org" style="color:#e0be53;">Website</a>
                 &nbsp;·&nbsp;
-                <a class="footer-link" href="mailto:${SUPPORT_EMAIL}" style="color:#e0be53;">Contact</a>
+                <a class="footer-link" href="mailto:admin@engage-youth.org" style="color:#e0be53;">Contact</a>
                 &nbsp;·&nbsp;
-                <a class="footer-link" href="${SITE_URL}/privacy-policy" style="color:#e0be53;">Privacy</a>
+                <a class="footer-link" href="https://engage-youth.org/privacy-policy" style="color:#e0be53;">Privacy</a>
               </p>
               <p class="footer-text" style="margin-top:14px; color:#7d8290;">
-                You're receiving this because you interacted with ${BRAND_NAME} on our website.
+                You're receiving this because you interacted with Engage Youth Foundation on our website.
               </p>
             </td>
           </tr>
 
         </table>
-        <!-- /Email container -->
 
       </td>
     </tr>
   </table>
 
 </body>
-</html>`;
-}
-
-/* ──────────────────────────────────────────────────────────────────────
- * Helper builders — used by individual templates to compose `content`
- * ────────────────────────────────────────────────────────────────────── */
-
-/**
- * Label + value row.
- */
-export function createInfoBlock(label: string, value: string): string {
-  return `<div class="info-block">
-    <span class="label">${escapeHtml(label)}</span>
-    <span class="value">${escapeHtml(value)}</span>
-  </div>`;
-}
-
-/**
- * Regular paragraph.
- * Pass `safe=true` for trusted HTML (e.g. <br>, links).
- */
-export function createParagraph(text: string, safe = false): string {
-  return `<p>${safe ? text : escapeHtml(text)}</p>`;
-}
-
-/**
- * Gold-accented call-out box.
- */
-export function createHighlight(text: string, safe = false): string {
-  return `<div class="highlight"><p>${safe ? text : escapeHtml(text)}</p></div>`;
-}
-
-/**
- * Centred gold CTA button.
- */
-export function createButton(text: string, url: string): string {
-  return `<div class="btn-wrap"><a href="${escapeAttr(url)}" class="btn" style="color:#1c1c1c;">${escapeHtml(text)}</a></div>`;
-}
-
-/**
- * Thin horizontal divider.
- */
-export function createDivider(): string {
-  return `<div class="divider"></div>`;
-}
-
-/* ──────────────────────────────────────────────────────────────────────
- * Escape helpers — prevent HTML injection from user-submitted data
- * ────────────────────────────────────────────────────────────────────── */
-
-function escapeHtml(input: string): string {
-  return String(input)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function escapeAttr(input: string): string {
-  return String(input).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
+</html>

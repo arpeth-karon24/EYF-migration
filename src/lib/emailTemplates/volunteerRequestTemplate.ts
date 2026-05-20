@@ -1,35 +1,56 @@
 /**
  * Volunteer Registration Email Templates
- * User confirmation and admin notification emails
+ * User confirmation + admin notification.
  */
 
-import { baseEmailTemplate, createInfoBlock, createParagraph, createHighlight } from './baseTemplate';
+import {
+  baseEmailTemplate,
+  createInfoBlock,
+  createParagraph,
+  createHighlight,
+  createButton,
+  createDivider,
+} from './baseTemplate';
 
 /**
- * User confirmation email - Volunteer Registration
+ * User confirmation email — sent to the new volunteer.
  */
-export function volunteerRegistrationUserEmail(name: string, email: string, eventTitle: string): string {
+export function volunteerRegistrationUserEmail(
+  name: string,
+  email: string,
+  eventTitle: string
+): string {
   const content = `
-    <h2>Welcome to Our Volunteer Team!</h2>
-    ${createParagraph(`Hello ${name},`)}
-    ${createParagraph('Thank you for your interest in volunteering with Engage Youth Fund! We are thrilled to have passionate individuals like you who want to make a difference in youth empowerment.')}
-    ${createHighlight('Your volunteer registration has been received and our team will review your application shortly. We will be in touch within 2-3 business days with next steps.')}
-    ${createInfoBlock('Event Interest', eventTitle)}
-    ${createInfoBlock('Your Email', email)}
-    ${createParagraph('In the meantime, feel free to explore our website to learn more about our mission and ongoing programs. If you have any questions, please reach out to us at admin@engage-youth.org')}
-    ${createParagraph('We look forward to having you join our volunteer community!')}
-    ${createParagraph('Best regards,<br>The Engage Youth Fund Team')}
+    <h2>Welcome to the EYF volunteer family, ${name} 🤝</h2>
+    ${createParagraph(
+      `Thank you for stepping up to make a difference. People like you are the heart of Engage Youth Foundation, and we're excited to have you on board.`
+    )}
+
+    ${createHighlight('Your registration has been received. Our team will review your application and reach out within 2–3 business days with next steps.')}
+
+    ${createInfoBlock('Event / interest area', eventTitle)}
+    ${createInfoBlock('Confirmation sent to', email)}
+
+    ${createDivider()}
+
+    ${createParagraph('Curious about what we do while you wait? Explore our current focus areas:')}
+    ${createButton('Explore Our Work', 'https://engage-youth.org/about-us')}
+
+    ${createParagraph(
+      `Questions before then? Reach out anytime at <a href="mailto:admin@engage-youth.org">admin@engage-youth.org</a>.<br><br>With gratitude,<br><strong>The Engage Youth Foundation Team</strong>`,
+      true
+    )}
   `;
 
   return baseEmailTemplate({
     content,
-    title: 'Volunteer Registration Confirmed',
-    preheader: 'Thank you for registering to volunteer',
+    title: 'Welcome to the EYF volunteer team',
+    preheader: `Thanks for joining, ${name}. We'll be in touch soon.`,
   });
 }
 
 /**
- * Admin notification email - Volunteer Registration
+ * Admin notification email — sent to the EYF inbox.
  */
 export function volunteerRegistrationAdminEmail(
   name: string,
@@ -42,25 +63,35 @@ export function volunteerRegistrationAdminEmail(
   motivation: string,
   submittedAt: string
 ): string {
+  const skillsTrim = skills.length > 200 ? `${skills.substring(0, 200)}…` : skills;
+  const motivTrim =
+    motivation.length > 200 ? `${motivation.substring(0, 200)}…` : motivation;
+
   const content = `
-    <h2>New Volunteer Registration</h2>
-    ${createParagraph('A new volunteer has registered for your program.')}
+    <h2>New volunteer registration</h2>
+    ${createParagraph('A new volunteer has registered through the website.')}
+
     ${createInfoBlock('Name', name)}
     ${createInfoBlock('Email', email)}
     ${createInfoBlock('Phone', phone)}
-    ${createInfoBlock('Event Interest', eventTitle)}
+    ${createInfoBlock('Event / interest area', eventTitle)}
     ${createInfoBlock('City', city)}
     ${createInfoBlock('Availability', availability)}
-    ${createInfoBlock('Skills & Interests', skills.substring(0, 200) + (skills.length > 200 ? '...' : ''))}
-    ${createInfoBlock('Motivation', motivation.substring(0, 200) + (motivation.length > 200 ? '...' : ''))}
-    ${createInfoBlock('Submitted At', submittedAt)}
-    ${createHighlight(`<a href="mailto:${email}?subject=Welcome to EYF Volunteer Program">Contact ${name}</a>`)}
-    ${createParagraph('Please review this application and follow up with the volunteer according to your onboarding process.')}
+    ${createInfoBlock('Skills & interests', skillsTrim)}
+    ${createInfoBlock('Motivation', motivTrim)}
+    ${createInfoBlock('Submitted at', submittedAt)}
+
+    ${createHighlight(
+      `<a href="mailto:${email}?subject=Welcome%20to%20the%20EYF%20Volunteer%20Program">→ Contact ${name} directly</a>`,
+      true
+    )}
+
+    ${createParagraph('Please review this application and onboard the volunteer per your standard process.')}
   `;
 
   return baseEmailTemplate({
     content,
-    title: 'New Volunteer Registration - Admin Notification',
-    preheader: `New volunteer: ${name}`,
+    title: `New volunteer — ${name}`,
+    preheader: `New volunteer registration from ${name}`,
   });
 }

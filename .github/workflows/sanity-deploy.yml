@@ -27,8 +27,17 @@ jobs:
       - name: Build
         run: npm run build
         env:
+          # Sanity (content fetching at build time)
           NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
           NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+          # Turnstile (CAPTCHA widget on forms — embedded into client bundle)
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          # Site URL (used by sitemap, robots, metadata)
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          # Google Analytics (optional — only loads if set)
+          NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
+          # Cloudinary (optional — only used if set)
+          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}
 
       - name: Deploy to Cloudflare Pages (production)
         run: npx wrangler pages deploy out --project-name=engage-youth-web --branch=main --commit-dirty=true

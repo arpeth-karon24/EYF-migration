@@ -1,34 +1,52 @@
 /**
  * Volunteer Support Request Email Templates
- * User confirmation and admin notification emails
+ * User confirmation + admin notification.
  */
 
-import { baseEmailTemplate, createInfoBlock, createParagraph, createHighlight } from './baseTemplate';
+import {
+  baseEmailTemplate,
+  createInfoBlock,
+  createParagraph,
+  createHighlight,
+  createDivider,
+} from './baseTemplate';
 
 /**
- * User confirmation email - Support Request
+ * User confirmation email — sent to the person who requested volunteer support.
  */
-export function supportRequestUserEmail(name: string, email: string, eventDate: string): string {
+export function supportRequestUserEmail(
+  name: string,
+  email: string,
+  eventDate: string
+): string {
   const content = `
-    <h2>Support Request Received</h2>
-    ${createParagraph(`Hello ${name},`)}
-    ${createParagraph('Thank you for reaching out to Engage Youth Fund for volunteer support! We appreciate the opportunity to help with your event.')}
-    ${createHighlight('Your support request has been received and our team will review your event details. We will be in touch within 1-2 business days to confirm volunteer availability and next steps.')}
-    ${createInfoBlock('Event Date', eventDate)}
-    ${createInfoBlock('Your Email', email)}
-    ${createParagraph('We are excited to support your initiative and make a positive impact together. If you have any additional information to share, please feel free to reply to this email.')}
-    ${createParagraph('Best regards,<br>The Engage Youth Fund Team')}
+    <h2>Your support request was received, ${name}</h2>
+    ${createParagraph(
+      `Thank you for reaching out to Engage Youth Foundation. We're honoured to consider supporting your event with volunteers from our community.`
+    )}
+
+    ${createHighlight('Our team will review your event details and respond within 1–2 business days to confirm volunteer availability and next steps.')}
+
+    ${createInfoBlock('Event date', eventDate)}
+    ${createInfoBlock('Confirmation sent to', email)}
+
+    ${createDivider()}
+
+    ${createParagraph(
+      `If anything changes about your event — date, location, volunteer count — just reply to this email and we'll update your request.<br><br>Looking forward to making an impact together,<br><strong>The Engage Youth Foundation Team</strong>`,
+      true
+    )}
   `;
 
   return baseEmailTemplate({
     content,
-    title: 'Support Request Received',
-    preheader: 'Thank you for requesting volunteer support',
+    title: 'Support request received',
+    preheader: `Thanks ${name} — we'll respond within 1–2 business days.`,
   });
 }
 
 /**
- * Admin notification email - Support Request
+ * Admin notification email — sent to the EYF inbox.
  */
 export function supportRequestAdminEmail(
   name: string,
@@ -41,25 +59,36 @@ export function supportRequestAdminEmail(
   eventDescription: string,
   submittedAt: string
 ): string {
+  const descTrim =
+    eventDescription.length > 400
+      ? `${eventDescription.substring(0, 400)}…`
+      : eventDescription;
+
   const content = `
-    <h2>New Volunteer Support Request</h2>
-    ${createParagraph('A new request for volunteer support has been submitted.')}
-    ${createInfoBlock('Requester Name', name)}
+    <h2>New volunteer support request</h2>
+    ${createParagraph('A new request for volunteer support has been submitted through the website.')}
+
+    ${createInfoBlock('Requester name', name)}
     ${createInfoBlock('Email', email)}
     ${createInfoBlock('Phone', phone)}
-    ${createInfoBlock('Event Date', date)}
-    ${createInfoBlock('Event Time', time)}
-    ${createInfoBlock('Event Location', location)}
-    ${createInfoBlock('Volunteers Needed', volunteersNeeded.toString())}
-    ${createInfoBlock('Event Description', eventDescription.substring(0, 400) + (eventDescription.length > 400 ? '...' : ''))}
-    ${createInfoBlock('Submitted At', submittedAt)}
-    ${createHighlight(`<a href="mailto:${email}?subject=EYF Volunteer Support Confirmation">Contact ${name}</a>`)}
-    ${createParagraph('Please review this request and determine volunteer availability. Follow up with the requester to confirm participation and provide any necessary details.')}
+    ${createInfoBlock('Event date', date)}
+    ${createInfoBlock('Event time', time)}
+    ${createInfoBlock('Event location', location)}
+    ${createInfoBlock('Volunteers needed', String(volunteersNeeded))}
+    ${createInfoBlock('Event description', descTrim)}
+    ${createInfoBlock('Submitted at', submittedAt)}
+
+    ${createHighlight(
+      `<a href="mailto:${email}?subject=EYF%20Volunteer%20Support%20Confirmation">→ Contact ${name} directly</a>`,
+      true
+    )}
+
+    ${createParagraph('Review the request, gauge volunteer availability, and follow up with the requester to confirm participation.')}
   `;
 
   return baseEmailTemplate({
     content,
-    title: 'New Volunteer Support Request - Admin Notification',
-    preheader: `Support request from ${name}`,
+    title: `Support request from ${name}`,
+    preheader: `Support request from ${name} — ${date}`,
   });
 }

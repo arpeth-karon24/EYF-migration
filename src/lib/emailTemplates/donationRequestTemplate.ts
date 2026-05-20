@@ -1,36 +1,56 @@
 /**
  * Donation Request Email Templates
- * User thank-you and admin notification emails
+ * User thank-you + admin notification.
  */
 
-import { baseEmailTemplate, createInfoBlock, createParagraph, createHighlight, createButton } from './baseTemplate';
+import {
+  baseEmailTemplate,
+  createInfoBlock,
+  createParagraph,
+  createHighlight,
+  createButton,
+  createDivider,
+} from './baseTemplate';
 
 /**
- * User thank-you email - Donation Request
+ * User thank-you email — sent to the donor.
  */
-export function donationUserEmail(name: string, email: string, donationType: string): string {
+export function donationUserEmail(
+  name: string,
+  email: string,
+  donationType: string
+): string {
+  const typeLabel = donationType === 'monetary' ? 'Monetary Donation' : 'In-Kind Donation';
+
   const content = `
-    <h2>Thank You for Your Generosity!</h2>
-    ${createParagraph(`Hello ${name},`)}
-    ${createParagraph('We are deeply grateful for your willingness to support Engage Youth Fund. Your generosity will directly impact the lives of young people we serve.')}
-    ${createHighlight('Your donation request has been received and our team will be in touch shortly to discuss the details and logistics.')}
-    ${createInfoBlock('Donation Type', donationType === 'monetary' ? 'Monetary Donation' : 'In-Kind Donation')}
-    ${createInfoBlock('Your Email', email)}
-    ${createParagraph('Your contribution will help us continue our mission of empowering youth and building futures. Together, we are making a difference!')}
-    ${createButton('Learn More About Our Impact', 'https://engage-youth.org/about-us')}
-    ${createParagraph('If you have any questions, please don\'t hesitate to reach out to us at admin@engage-youth.org')}
-    ${createParagraph('With heartfelt gratitude,<br>The Engage Youth Fund Team')}
+    <h2>Thank you for your generosity, ${name}</h2>
+    ${createParagraph(`Your support means the world to us. Donations like yours directly fund the programs, mentorship, and community projects that empower the next generation of leaders.`)}
+
+    ${createHighlight('Your donation request has been received. A team member will reach out within 1–2 business days to confirm details and coordinate logistics.')}
+
+    ${createInfoBlock('Donation type', typeLabel)}
+    ${createInfoBlock('Confirmation sent to', email)}
+
+    ${createDivider()}
+
+    ${createParagraph('Want to see the impact of your contribution? Learn about our current focus areas and community work:')}
+    ${createButton('See Our Impact', 'https://engage-youth.org/about-us')}
+
+    ${createParagraph(
+      `Have questions before we connect? Reply to this email or write to <a href="mailto:admin@engage-youth.org">admin@engage-youth.org</a>.<br><br>With heartfelt gratitude,<br><strong>The Engage Youth Foundation Team</strong>`,
+      true
+    )}
   `;
 
   return baseEmailTemplate({
     content,
-    title: 'Donation Request Received',
-    preheader: 'Thank you for supporting EYF',
+    title: 'Thank you for supporting EYF',
+    preheader: `Your ${typeLabel.toLowerCase()} request was received.`,
   });
 }
 
 /**
- * Admin notification email - Donation Request
+ * Admin notification email — sent to the EYF inbox.
  */
 export function donationAdminEmail(
   name: string,
@@ -40,22 +60,40 @@ export function donationAdminEmail(
   notes: string | undefined,
   submittedAt: string
 ): string {
+  const typeLabel = donationType === 'monetary' ? 'Monetary' : 'In-Kind';
+  const itemsTrim = items
+    ? items.length > 300
+      ? `${items.substring(0, 300)}…`
+      : items
+    : null;
+  const notesTrim = notes
+    ? notes.length > 300
+      ? `${notes.substring(0, 300)}…`
+      : notes
+    : null;
+
   const content = `
-    <h2>New Donation Request</h2>
-    ${createParagraph('A new donation has been requested through the website.')}
-    ${createInfoBlock('Donor Name', name)}
+    <h2>New donation request</h2>
+    ${createParagraph('A donation request has been submitted through the website.')}
+
+    ${createInfoBlock('Donor name', name)}
     ${createInfoBlock('Email', email)}
-    ${createInfoBlock('Donation Type', donationType === 'monetary' ? 'Monetary' : 'In-Kind')}
-    ${items ? createInfoBlock('Items/Details', items.substring(0, 300) + (items.length > 300 ? '...' : '')) : ''}
-    ${notes ? createInfoBlock('Additional Notes', notes.substring(0, 300) + (notes.length > 300 ? '...' : '')) : ''}
-    ${createInfoBlock('Submitted At', submittedAt)}
-    ${createHighlight(`<a href="mailto:${email}?subject=EYF Donation Request Follow-up">Contact ${name}</a>`)}
-    ${createParagraph('Please review this donation request and follow up with the donor to coordinate logistics and process the donation according to your procedures.')}
+    ${createInfoBlock('Donation type', typeLabel)}
+    ${itemsTrim ? createInfoBlock('Items / details', itemsTrim) : ''}
+    ${notesTrim ? createInfoBlock('Additional notes', notesTrim) : ''}
+    ${createInfoBlock('Submitted at', submittedAt)}
+
+    ${createHighlight(
+      `<a href="mailto:${email}?subject=EYF%20Donation%20Request%20Follow-up">→ Contact ${name} directly</a>`,
+      true
+    )}
+
+    ${createParagraph('Please follow up to coordinate logistics and process the donation per standard procedures.')}
   `;
 
   return baseEmailTemplate({
     content,
-    title: 'New Donation Request - Admin Notification',
-    preheader: `New donation from ${name}`,
+    title: `New donation request from ${name}`,
+    preheader: `${typeLabel} donation request from ${name}`,
   });
 }
