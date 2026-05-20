@@ -42,6 +42,15 @@ _source-home.html
 # Local reference docs (planning, migration notes) — never commit
 /reference_docs/
 
+# Claude Code internal files — keep on disk only, never push to GitHub
+/.claude/
+
+# Sanity Studio runtime cache — never push
+/.sanity/
+
+# Internal backend/planning docs — never push
+/docs/
+
 # Root README only; other markdown at repo root stays local
 /*.md
 !README.md
