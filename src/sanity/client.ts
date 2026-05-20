@@ -16,13 +16,15 @@ export function getSanityClient(): SanityClient | null {
 
 export function urlFor(source: SanityImage): string | null {
   const client = getSanityClient();
-  if (!client || !source) return null;
+  // Reject images stuck in upload state (no asset reference yet)
+  if (!client || !source || !source.asset) return null;
   return imageUrlBuilder(client).image(source).auto('format').url();
 }
 
 export function urlForSize(source: SanityImage, width: number, height?: number): string | null {
   const client = getSanityClient();
-  if (!client || !source) return null;
+  // Reject images stuck in upload state (no asset reference yet)
+  if (!client || !source || !source.asset) return null;
   let builder = imageUrlBuilder(client).image(source).auto('format').width(width);
   if (height) builder = builder.height(height);
   return builder.url();
