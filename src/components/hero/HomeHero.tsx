@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Autoplay, Keyboard, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -7,6 +8,16 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { HERO_SLIDES } from "@/constants/homeContent";
 
+/**
+ * Home hero banner.
+ *
+ * Performance notes:
+ * - First slide uses `priority` so it's the LCP (Largest Contentful Paint).
+ *   Browser preloads it and we get the green Lighthouse score.
+ * - Remaining slides lazy-load to keep initial bundle small.
+ * - `<Image>` (not background-image) lets Next.js serve responsive
+ *   srcset + modern formats (AVIF/WebP) automatically.
+ */
 export function HomeHero() {
   return (
     <section className="home-hero relative w-full overflow-hidden bg-black" aria-label="Homepage banner">
@@ -23,10 +34,19 @@ export function HomeHero() {
       >
         {HERO_SLIDES.map((slide, idx) => (
           <SwiperSlide key={`${idx}-${slide.title}`}>
-            <div
-              className="relative flex min-h-[500px] md:min-h-[700px] lg:min-h-[820px] w-full items-center bg-cover bg-center bg-no-repeat"
-              style={{ backgroundImage: `url(${slide.image})` }}
-            >
+            <div className="relative flex min-h-[500px] md:min-h-[700px] lg:min-h-[820px] w-full items-center">
+              {/* Background image — Next.js Image with priority on first slide
+                  for fast LCP. Fills the container, covers like background-size:cover. */}
+              <Image
+                src={slide.image}
+                alt={slide.title}
+                fill
+                priority={idx === 0}
+                loading={idx === 0 ? "eager" : "lazy"}
+                fetchPriority={idx === 0 ? "high" : "auto"}
+                sizes="100vw"
+                className="object-cover object-center"
+              />
               <div className="absolute inset-0 bg-black/60 z-[1]" />
               <div className="relative z-[2] w-full">
                 <div className="mx-auto max-w-container px-4 py-20 lg:py-32">

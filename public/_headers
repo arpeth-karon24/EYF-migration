@@ -1,0 +1,32 @@
+# Cloudflare Pages — HTTP response headers
+# Documented at: https://developers.cloudflare.com/pages/configuration/headers/
+#
+# These boost the Lighthouse "Best Practices" score and harden the site
+# against common attacks (clickjacking, MIME-sniffing, mixed content, etc.)
+
+/*
+  # Prevent the site from being framed by other domains — clickjacking guard.
+  X-Frame-Options: SAMEORIGIN
+
+  # Tell the browser to honor the declared Content-Type strictly.
+  X-Content-Type-Options: nosniff
+
+  # Modern Permissions-Policy — disable APIs the site doesn't use.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+
+  # Send referrer only on same-origin navigations; strip on cross-origin.
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Tell search engines (and Lighthouse) we serve over HTTPS only.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+  # Cross-Origin policies — sane defaults for a static site.
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+
+# Long-cache hashed Next.js build assets (filename has content hash).
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Long-cache the self-hosted images bundle.
+/images/*
+  Cache-Control: public, max-age=31536000, immutable

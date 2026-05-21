@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@400;700;900&family=Open+Sans:wght@300;400;600;700&display=swap');
+/* Fonts are loaded via next/font in layout.tsx — that avoids
+   render-blocking @import requests and gives Next.js full control
+   over preloading and font-display: swap behavior. */
 
 @tailwind base;
 @tailwind components;
