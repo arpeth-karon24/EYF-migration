@@ -1,17 +1,45 @@
 'use client';
 
-import { useState, FormEvent, useRef, type ReactNode } from 'react';
+import { useState, FormEvent, useRef, useMemo, type ReactNode } from 'react';
 import {
   User, Mail, Phone, Calendar, MapPin, Clock, Star, Heart, Shield, ChevronDown,
 } from 'lucide-react';
 import { VOLUNTEER_REGISTRATION_EVENTS } from '@/constants/volunteerRegistration';
 import { useFormSubmission } from '@/hooks/useFormSubmission';
 import { useTurnstile } from '@/hooks/useTurnstile';
+import type { SanityEvent } from '@/sanity/types';
 
-export default function VolunteerRegistrationForm({ onSuccess }: { onSuccess?: () => void }) {
+interface VolunteerRegistrationFormProps {
+  onSuccess?: () => void;
+  /**
+   * Upcoming events from Sanity. When provided, they populate the
+   * "Event title" dropdown. Falls back to VOLUNTEER_REGISTRATION_EVENTS
+   * constants when omitted or empty (e.g. on the older static path).
+   */
+  upcomingEvents?: SanityEvent[];
+}
+
+export default function VolunteerRegistrationForm({ onSuccess, upcomingEvents }: VolunteerRegistrationFormProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { token: turnstileToken, reset: resetTurnstile } = useTurnstile(containerRef, 'dark');
   const { isLoading, message, submit, clearMessage } = useFormSubmission({ endpoint: '/api/volunteer' });
+
+  // ─── Build event-title dropdown options ─────────────────────────────────
+  // Prefer live Sanity events when available. Always include the
+  // "General volunteering" catch-all so non-event registrations still work.
+  const eventOptions = useMemo(() => {
+    if (upcomingEvents && upcomingEvents.length > 0) {
+      return [
+        ...upcomingEvents.map((evt) => ({
+          value: evt._id,
+          label: evt.title,
+        })),
+        { value: 'general', label: 'General volunteering (not tied to a specific event)' },
+      ];
+    }
+    // Fallback to legacy hardcoded list
+    return VOLUNTEER_REGISTRATION_EVENTS.map((o) => ({ value: o.value, label: o.label }));
+  }, [upcomingEvents]);
 
   const [formData, setFormData] = useState({
     name: '', email: '', contactNumber: '', eventTitle: '',
@@ -92,7 +120,7 @@ export default function VolunteerRegistrationForm({ onSuccess }: { onSuccess?: (
           <select name="eventTitle" value={formData.eventTitle} onChange={handleInputChange} required
             className={`${base} cursor-pointer appearance-none pl-10`}>
             <option value="" disabled className="bg-[#1e1e1e] text-gray-500">Select an event or volunteering option</option>
-            {VOLUNTEER_REGISTRATION_EVENTS.map((event) => (
+            {eventOptions.map((event) => (
               <option key={event.value} value={event.value} className="bg-[#1e1e1e] text-white">
                 {event.label}
               </option>

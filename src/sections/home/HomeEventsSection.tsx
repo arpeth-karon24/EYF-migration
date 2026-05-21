@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -26,6 +27,61 @@ interface Props {
 }
 
 export function HomeEventsSection({ upcomingEvents }: Props) {
+  // ─── Filter state — bound to each form field ────────────────────────────
+  const [keywords, setKeywords] = useState("");
+  const [location, setLocation] = useState("");
+  const [dateRange, setDateRange] = useState("");
+  const [category, setCategory] = useState("");
+  const [eventType, setEventType] = useState("");
+
+  // ─── Apply filters reactively whenever a field or upcomingEvents changes ─
+  const filteredEvents = useMemo(() => {
+    const kw = keywords.trim().toLowerCase();
+    const loc = location.trim().toLowerCase();
+    const dr = dateRange.trim().toLowerCase();
+
+    return upcomingEvents.filter((event) => {
+      // Keywords — match title or description (case-insensitive substring)
+      if (kw) {
+        const haystack = `${event.title} ${event.description ?? ""}`.toLowerCase();
+        if (!haystack.includes(kw)) return false;
+      }
+      // Location — substring match (case-insensitive)
+      if (loc) {
+        if (!event.location.toLowerCase().includes(loc)) return false;
+      }
+      // Category — exact value match (matches against the select option value)
+      if (category) {
+        const eventCategorySlug = event.category?.toLowerCase().replace(/\s+/g, "-") ?? "";
+        if (eventCategorySlug !== category && event.category?.toLowerCase() !== category)
+          return false;
+      }
+      // Event type — exact value match
+      if (eventType) {
+        const eventTypeSlug = event.eventType?.toLowerCase() ?? "";
+        if (eventTypeSlug !== eventType) return false;
+      }
+      // Date range — basic textual substring match against formatted date
+      // (e.g. typing "2026" or "March" will narrow to those events)
+      if (dr) {
+        const formatted = formatEventDate(event.startDate, event.endDate).toLowerCase();
+        if (!formatted.includes(dr)) return false;
+      }
+      return true;
+    });
+  }, [upcomingEvents, keywords, location, dateRange, category, eventType]);
+
+  const hasActiveFilters =
+    keywords || location || dateRange || category || eventType;
+
+  const resetFilters = () => {
+    setKeywords("");
+    setLocation("");
+    setDateRange("");
+    setCategory("");
+    setEventType("");
+  };
+
   return (
     <section className="bg-eyf-page py-16 lg:py-24" aria-labelledby="choose-events-heading">
       <div className="mx-auto max-w-container px-4">
@@ -36,14 +92,20 @@ export function HomeEventsSection({ upcomingEvents }: Props) {
         </div>
 
         <div className="mx-auto max-w-5xl">
-          {/* Filter form */}
-          <form className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" action="#" method="get" role="search">
+          {/* Filter form — fully wired up, filters live as you type/select */}
+          <form
+            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            onSubmit={(e) => e.preventDefault()}
+            role="search"
+          >
             <div className="flex flex-col gap-1">
               <input
                 id="search_keywords"
                 name="search_keywords"
                 type="text"
                 placeholder="Keywords"
+                value={keywords}
+                onChange={(e) => setKeywords(e.target.value)}
                 className="w-full rounded border border-white/20 bg-white px-4 py-3 text-[13px] text-gray-700 placeholder-gray-400 outline-none transition-all focus:border-eyf-gold"
               />
             </div>
@@ -53,6 +115,8 @@ export function HomeEventsSection({ upcomingEvents }: Props) {
                 name="search_location"
                 type="text"
                 placeholder="Location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
                 className="w-full rounded border border-white/20 bg-white px-4 py-3 text-[13px] text-gray-700 placeholder-gray-400 outline-none transition-all focus:border-eyf-gold"
               />
             </div>
@@ -61,19 +125,22 @@ export function HomeEventsSection({ upcomingEvents }: Props) {
                 id="search_datetimes"
                 name="search_datetimes"
                 type="text"
-                placeholder="Select Date Range"
+                placeholder="Date (e.g. 2026 or March)"
+                value={dateRange}
+                onChange={(e) => setDateRange(e.target.value)}
                 className="w-full rounded border border-white/20 bg-white px-4 py-3 text-[13px] text-gray-700 placeholder-gray-400 outline-none transition-all focus:border-eyf-gold"
-                readOnly
               />
             </div>
             <div className="flex flex-col gap-1 lg:col-span-2">
               <select
                 id="search_categories"
                 name="search_categories"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
                 className="w-full appearance-none rounded border border-white/20 bg-white px-4 py-3 text-[13px] text-gray-700 outline-none transition-all focus:border-eyf-gold"
               >
                 <option value="">Choose an Event Category</option>
-                {EVENT_CATEGORIES.map((o) => (
+                {EVENT_CATEGORIES.filter((o) => o.value).map((o) => (
                   <option key={o.label} value={o.value}>{o.label}</option>
                 ))}
               </select>
@@ -82,24 +149,46 @@ export function HomeEventsSection({ upcomingEvents }: Props) {
               <select
                 id="search_event_types"
                 name="search_event_types"
+                value={eventType}
+                onChange={(e) => setEventType(e.target.value)}
                 className="w-full appearance-none rounded border border-white/20 bg-white px-4 py-3 text-[13px] text-gray-700 outline-none transition-all focus:border-eyf-gold"
               >
                 <option value="">Choose an Event Type</option>
-                {EVENT_TYPES.map((o) => (
+                {EVENT_TYPES.filter((o) => o.value).map((o) => (
                   <option key={o.label} value={o.value}>{o.label}</option>
                 ))}
               </select>
             </div>
           </form>
 
+          {/* Filter status row — visible only when filters are active */}
+          {hasActiveFilters && (
+            <div className="mt-4 flex items-center justify-between gap-4 text-[12px] text-white/70">
+              <span>
+                Showing <strong className="text-eyf-gold">{filteredEvents.length}</strong> of{" "}
+                <strong className="text-white">{upcomingEvents.length}</strong> events
+              </span>
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="font-poppins text-[11px] font-bold uppercase tracking-widest text-eyf-gold transition-opacity hover:opacity-80"
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
+
           {/* Events slider or empty state */}
-          {upcomingEvents.length > 0 ? (
+          {filteredEvents.length > 0 ? (
             <div className="mt-12">
               <Swiper
+                // Re-mount the Swiper when the filtered set changes — otherwise Swiper's
+                // internal slide cache shows stale slides after filtering.
+                key={filteredEvents.map((e) => e._id).join("|")}
                 modules={[Navigation, Autoplay]}
                 navigation
                 autoplay={{ delay: 4000, disableOnInteraction: false }}
-                loop={upcomingEvents.length > 2}
+                loop={filteredEvents.length > 2}
                 spaceBetween={24}
                 slidesPerView={1}
                 breakpoints={{
@@ -108,7 +197,7 @@ export function HomeEventsSection({ upcomingEvents }: Props) {
                 }}
                 className="w-full pb-4"
               >
-                {upcomingEvents.map((event) => {
+                {filteredEvents.map((event) => {
                   const imageUrl = event.mainImage ? urlFor(event.mainImage) : null;
                   return (
                     <SwiperSlide key={event._id}>
@@ -183,7 +272,9 @@ export function HomeEventsSection({ upcomingEvents }: Props) {
             </div>
           ) : (
             <div className="mt-12 rounded-lg border border-[#f5c6cb] bg-[#f8d7da] px-6 py-4 text-center text-[13px] font-normal text-[#721c24]">
-              There are currently no events.
+              {hasActiveFilters
+                ? "No events match your filters. Try clearing them or adjusting the criteria."
+                : "There are currently no events."}
             </div>
           )}
         </div>

@@ -3,13 +3,21 @@
  * Reusable hook for form submission with API calls and loading/error states
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { FormSubmissionResponse, ValidationError } from '@/types/api';
 
 export interface UseFormSubmissionOptions {
   endpoint: string;
   onSuccess?: (response: FormSubmissionResponse) => void;
   onError?: (error: string) => void;
+  /**
+   * Auto-dismiss the success/error toast after this many ms.
+   * - Success: defaults to 5000ms (matches common UX patterns)
+   * - Error: defaults to 8000ms (longer, so users can read what went wrong)
+   * Pass `0` to disable auto-dismiss for that type.
+   */
+  successDismissMs?: number;
+  errorDismissMs?: number;
 }
 
 export interface UseFormSubmissionState {
@@ -23,13 +31,35 @@ export interface UseFormSubmissionState {
  * Hook for handling form submissions to Cloudflare Functions
  */
 export function useFormSubmission(options: UseFormSubmissionOptions) {
-  const { endpoint, onSuccess, onError } = options;
+  const {
+    endpoint,
+    onSuccess,
+    onError,
+    successDismissMs = 5000,
+    errorDismissMs = 8000,
+  } = options;
 
   const [state, setState] = useState<UseFormSubmissionState>({
     isLoading: false,
     message: null,
     errors: [],
   });
+
+  // Auto-dismiss message after the configured timeout.
+  // Success → 5s by default. Error → 8s (more time to read).
+  // Pass `0` for the corresponding dismiss prop to keep the message sticky.
+  useEffect(() => {
+    if (!state.message) return;
+    const timeout =
+      state.message.type === 'success' ? successDismissMs : errorDismissMs;
+    if (timeout <= 0) return;
+
+    const timer = setTimeout(() => {
+      setState((prev) => (prev.message ? { ...prev, message: null } : prev));
+    }, timeout);
+
+    return () => clearTimeout(timer);
+  }, [state.message, successDismissMs, errorDismissMs]);
 
   const submit = useCallback(
     async (formData: Record<string, unknown>, turnsileToken: string) => {

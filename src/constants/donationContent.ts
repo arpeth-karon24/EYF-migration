@@ -36,10 +36,8 @@ export const DONATION_GUIDELINES_NOTE =
   "Unfortunately, we cannot accept opened or partially used hygiene products like bar soap, bedding, pillows, mattresses, furniture, prepared food, pre-assembled hygiene kits.";
 
 export const DONATION_MEDIA = {
-  inKindHero:
-    "https://engage-youth.org/wp-content/uploads/2023/11/202_inKindDonations.webp",
-  amazonWishlist:
-    "https://engage-youth.org/wp-content/uploads/2023/11/204_Amazon-wishlist-1-1024x512.png",
+  inKindHero: "/images/donation/in-kind.webp",
+  amazonWishlist: "/images/donation/amazon-wishlist.png",
 };
 
 export const AMAZON_WISHLIST_URL =

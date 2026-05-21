@@ -3,13 +3,19 @@
 import { useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import VolunteerRegistrationForm from './VolunteerRegistrationForm';
+import type { SanityEvent } from '@/sanity/types';
 
 interface VolunteerRegistrationModalProps {
   open: boolean;
   onClose: () => void;
+  /**
+   * Upcoming events fetched at build time from Sanity. Optional — if not
+   * provided, the form falls back to a small set of hardcoded options.
+   */
+  upcomingEvents?: SanityEvent[];
 }
 
-export default function VolunteerRegistrationModal({ open, onClose }: VolunteerRegistrationModalProps) {
+export default function VolunteerRegistrationModal({ open, onClose, upcomingEvents }: VolunteerRegistrationModalProps) {
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -74,7 +80,7 @@ export default function VolunteerRegistrationModal({ open, onClose }: VolunteerR
         </div>
 
         <div className="overflow-y-auto px-6 py-6 md:px-8 md:py-7">
-          <VolunteerRegistrationForm />
+          <VolunteerRegistrationForm upcomingEvents={upcomingEvents} />
         </div>
       </div>
     </div>,

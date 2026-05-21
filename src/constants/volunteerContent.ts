@@ -53,28 +53,28 @@ export const VOLUNTEER_SPOTLIGHTS: VolunteerSpotlight[] = [
     title: "Programs that reach young people",
     description:
       "From workshops to community gatherings, volunteers help us create welcoming spaces where youth can learn, connect, and build confidence alongside peers and mentors.",
-    image: "https://engage-youth.org/wp-content/uploads/2023/11/bm3-scaled-1.jpg",
+    image: "/images/volunteer/community.jpg",
     imageAlt: "Group of young people collaborating at an Engage Youth Foundation program",
   },
   {
     title: "Hands-on community impact",
     description:
       "Whether you are supporting drives, events, or day-of logistics, your time directly strengthens programs that address real needs in our neighborhoods.",
-    image: "https://engage-youth.org/wp-content/uploads/2023/11/6.3_Fooddrive.jpg",
+    image: "/images/volunteer/food-drive-full.jpg",
     imageAlt: "Volunteers organizing food and supplies at a community drive",
   },
   {
     title: "Awareness and outreach",
     description:
       "Volunteers amplify our mission by helping with outreach, storytelling, and education—ensuring more families and partners understand how they can get involved.",
-    image: "https://engage-youth.org/wp-content/uploads/2023/11/6.2_Homeless.jpg",
+    image: "/images/volunteer/homeless-full.jpg",
     imageAlt: "Community outreach and support activities",
   },
 ];
 
 /** Full-width banner between intro and spotlights */
 export const VOLUNTEER_HERO_STRIP = {
-  src: "https://engage-youth.org/wp-content/uploads/2023/11/6.3_Fooddrive.jpg",
+  src: "/images/volunteer/food-drive-full.jpg",
   alt: "Volunteers working together at a community food drive",
   headline: "Your time changes outcomes",
   subline:

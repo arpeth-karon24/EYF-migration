@@ -9,8 +9,7 @@ export const MISSION_VISION = {
   }
 };
 
-export const MISSION_VISION_GRAPHIC =
-  "https://engage-youth.org/wp-content/uploads/2024/03/visionmission-removebg-preview.png";
+export const MISSION_VISION_GRAPHIC = "/images/about/vision-mission.png";
 
 export const EVOLUTION_SECTIONS = [
   {
@@ -45,14 +44,13 @@ export const BOARD_MEMBERS = [
     id: "member-1",
     name: "Jagan Nair",
     role: "President & Founder",
-    image: "https://engage-youth.org/wp-content/uploads/2024/03/jagan.jpg",
+    image: "/images/about/jagan.jpg",
   },
   {
     id: "member-2",
     name: "Janaki Nair",
     role: "Board Member",
-    image:
-      "https://engage-youth.org/wp-content/uploads/2024/03/WhatsApp-Image-2023-12-19-at-11.55.33_d5a9c436-768x1024.jpg",
+    image: "/images/about/board-member-1.jpg",
   },
 ];
 
@@ -61,18 +59,18 @@ export const ADVISORY_BOARD = [
     id: "advisor-1",
     name: "Advisory Board Member",
     role: "Advisor",
-    image: "https://engage-youth.org/wp-content/uploads/2023/11/bm-1-scaled-1-684x1024.jpg",
+    image: "/images/about/board-member-2.jpg",
   },
   {
     id: "advisor-2",
     name: "Advisory Board Member",
     role: "Advisor",
-    image: "https://engage-youth.org/wp-content/uploads/2023/11/board-3-1.jpeg",
+    image: "/images/about/board-member-3.jpeg",
   },
   {
     id: "advisor-3",
     name: "Advisory Board Member",
     role: "Advisor",
-    image: "https://engage-youth.org/wp-content/uploads/2023/11/bm4-scaled-1-1024x700.jpg",
+    image: "/images/about/board-member-4.jpg",
   },
 ];

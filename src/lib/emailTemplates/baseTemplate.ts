@@ -11,9 +11,11 @@
  * - Dark sections (#1c1c1c / #1f2024) match the live site.
  */
 
-const LOGO_URL =
-  'https://engage-youth.org/wp-content/uploads/2024/03/eyf-logo-2.png';
-const SITE_URL = 'https://engage-youth.org';
+// Emails are opened in external clients (Gmail, Outlook, etc.) — so the
+// logo URL must be ABSOLUTE. We point it at the live Cloudflare Pages site
+// where /images/logo/eyf-logo.png is self-hosted.
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://engage-youth-web.pages.dev';
+const LOGO_URL = `${SITE_URL.replace(/\/$/, '')}/images/logo/eyf-logo.png`;
 const SUPPORT_EMAIL = 'admin@engage-youth.org';
 const BRAND_NAME = 'Engage Youth Foundation';
 const BRAND_TAGLINE = 'Channelizing Freshness to the Community';
@@ -62,23 +64,24 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
     a { color: #1f6feb; text-decoration: none; }
 
     /* Header — full WP-style logo lockup (matches site nav header) */
+    /* Logo is the visual anchor; text is supportive */
     .brand-name {
       font-family: 'Poppins', 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 26px;
+      font-size: 20px;
       font-weight: 700;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
       color: #ffffff;
-      line-height: 1.15;
+      line-height: 1.2;
       margin: 0;
     }
     .brand-tagline {
       font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 600;
-      letter-spacing: 1.4px;
+      letter-spacing: 1.2px;
       color: #e0be53;
       text-transform: uppercase;
-      margin: 8px 0 0 0;
+      margin: 6px 0 0 0;
     }
 
     /* Content typography */
@@ -167,12 +170,12 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
     /* Responsive */
     @media only screen and (max-width: 620px) {
       .container { width: 100% !important; }
-      .px { padding-left: 22px !important; padding-right: 22px !important; }
-      .brand-name { font-size: 20px !important; }
-      .brand-tagline { font-size: 10px !important; letter-spacing: 1px !important; }
+      .px { padding-left: 18px !important; padding-right: 18px !important; }
+      .brand-name { font-size: 16px !important; }
+      .brand-tagline { font-size: 9px !important; letter-spacing: 1px !important; }
       .content h2 { font-size: 20px !important; }
-      .header-logo { width: 90px !important; height: auto !important; }
-      .header-logo-cell { width: 100px !important; }
+      .header-logo { width: 140px !important; height: auto !important; }
+      .header-logo-cell { width: 150px !important; }
     }
   </style>
 </head>
@@ -192,18 +195,19 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
 
           <!-- ── HEADER ─────────────────────────────────────────── -->
           <!-- Full WP-style logo lockup on dark nav background, matching the live site header -->
+          <!-- Logo is the visual anchor; brand text is intentionally smaller -->
           <tr>
-            <td bgcolor="#1c1c1c" style="background-color:#1c1c1c; padding: 28px 32px;" class="px">
+            <td bgcolor="#1c1c1c" style="background-color:#1c1c1c; padding: 24px 32px;" class="px">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
-                  <td valign="middle" width="140" class="header-logo-cell" style="width:140px;">
+                  <td valign="middle" width="220" class="header-logo-cell" style="width:220px;">
                     <img src="${LOGO_URL}"
                          alt="${BRAND_NAME} — ${BRAND_TAGLINE}"
-                         width="120"
+                         width="200"
                          class="header-logo"
-                         style="display:block; width:120px; height:auto; max-width:120px; border:0; outline:none;" />
+                         style="display:block; width:200px; height:auto; max-width:200px; border:0; outline:none;" />
                   </td>
-                  <td valign="middle" style="padding-left:20px;">
+                  <td valign="middle" style="padding-left:18px;">
                     <p class="brand-name">${BRAND_NAME}</p>
                     <p class="brand-tagline">${BRAND_TAGLINE}</p>
                   </td>

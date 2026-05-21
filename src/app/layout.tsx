@@ -54,10 +54,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "https://engage-youth.org/wp-content/uploads/2024/03/cropped-cropped-fav-logo-3-1-32x32.png", sizes: "32x32" },
-      { url: "https://engage-youth.org/wp-content/uploads/2024/03/cropped-cropped-fav-logo-3-1-192x192.png", sizes: "192x192" },
+      { url: "/images/logo/favicon-32x32.png", sizes: "32x32" },
+      { url: "/images/logo/favicon-192x192.png", sizes: "192x192" },
     ],
-    apple: "https://engage-youth.org/wp-content/uploads/2024/03/cropped-cropped-fav-logo-3-1-180x180.png",
+    apple: "/images/logo/apple-touch-icon.png",
   },
 };
 

@@ -36,8 +36,6 @@ jobs:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
           # Google Analytics (optional — only loads if set)
           NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
-          # Cloudinary (optional — only used if set)
-          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}
 
       - name: Deploy to Cloudflare Pages (production)
         run: npx wrangler pages deploy out --project-name=engage-youth-web --branch=main --commit-dirty=true
