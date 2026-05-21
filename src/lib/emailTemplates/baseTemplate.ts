@@ -70,24 +70,17 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
     a { color: #1f6feb; text-decoration: none; }
 
     /* Header — full WP-style logo lockup (matches site nav header) */
-    /* Logo is the visual anchor; text is supportive */
-    .brand-name {
-      font-family: 'Poppins', 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-      color: #ffffff;
-      line-height: 1.2;
-      margin: 0;
-    }
+    /* Logo already has "Engage Youth Foundation" baked in; we only show
+       the catchy caption beside it to avoid duplicating the brand name. */
     .brand-tagline {
-      font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 1.2px;
+      font-family: 'Poppins', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
       color: #e0be53;
       text-transform: uppercase;
-      margin: 6px 0 0 0;
+      line-height: 1.45;
+      margin: 0;
     }
 
     /* Content typography */
@@ -176,12 +169,11 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
     /* Responsive */
     @media only screen and (max-width: 620px) {
       .container { width: 100% !important; }
-      .px { padding-left: 18px !important; padding-right: 18px !important; }
-      .brand-name { font-size: 16px !important; }
-      .brand-tagline { font-size: 9px !important; letter-spacing: 1px !important; }
+      .px { padding-left: 16px !important; padding-right: 16px !important; }
+      .brand-tagline { font-size: 11px !important; letter-spacing: 1.2px !important; }
       .content h2 { font-size: 20px !important; }
-      .header-logo { width: 140px !important; height: auto !important; }
-      .header-logo-cell { width: 150px !important; }
+      .header-logo { width: 180px !important; height: auto !important; }
+      .header-logo-cell { width: 190px !important; }
     }
   </style>
 </head>
@@ -200,21 +192,21 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
         <table role="presentation" class="container" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:10px; overflow:hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
 
           <!-- ── HEADER ─────────────────────────────────────────── -->
-          <!-- Full WP-style logo lockup on dark nav background, matching the live site header -->
-          <!-- Logo is the visual anchor; brand text is intentionally smaller -->
+          <!-- Big self-contained logo on dark nav background.
+               The logo image already includes the "Engage Youth Foundation"
+               wordmark, so we only show the catchy caption beside it. -->
           <tr>
             <td bgcolor="#1c1c1c" style="background-color:#1c1c1c; padding: 24px 32px;" class="px">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
-                  <td valign="middle" width="220" class="header-logo-cell" style="width:220px;">
+                  <td valign="middle" width="280" class="header-logo-cell" style="width:280px;">
                     <img src="${LOGO_URL}"
                          alt="${BRAND_NAME} — ${BRAND_TAGLINE}"
-                         width="200"
+                         width="260"
                          class="header-logo"
-                         style="display:block; width:200px; height:auto; max-width:200px; border:0; outline:none;" />
+                         style="display:block; width:260px; height:auto; max-width:260px; border:0; outline:none;" />
                   </td>
-                  <td valign="middle" style="padding-left:18px;">
-                    <p class="brand-name">${BRAND_NAME}</p>
+                  <td valign="middle" style="padding-left:20px;">
                     <p class="brand-tagline">${BRAND_TAGLINE}</p>
                   </td>
                 </tr>
