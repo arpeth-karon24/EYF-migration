@@ -1,8 +1,14 @@
-name: Deploy on Sanity Content Change
+name: Deploy to Cloudflare Pages
 
 on:
+  # Sanity Studio publishes content → webhook fires this event
   repository_dispatch:
     types: [sanity-deploy]
+  # Code changes pushed to main → deploy the new build
+  push:
+    branches: [main]
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
 
 jobs:
   deploy:

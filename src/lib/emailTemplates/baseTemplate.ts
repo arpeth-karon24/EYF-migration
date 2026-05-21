@@ -14,7 +14,13 @@
 // Emails are opened in external clients (Gmail, Outlook, etc.) — so the
 // logo URL must be ABSOLUTE. We point it at the live Cloudflare Pages site
 // where /images/logo/eyf-logo.png is self-hosted.
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://engage-youth-web.pages.dev';
+//
+// Note: this module is imported by Cloudflare Pages Functions (Workers),
+// where `process` is not defined globally. We guard the env access so the
+// same module works in both Node-style build environments and Workers.
+const SITE_URL =
+  (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SITE_URL) ||
+  'https://engage-youth-web.pages.dev';
 const LOGO_URL = `${SITE_URL.replace(/\/$/, '')}/images/logo/eyf-logo.png`;
 const SUPPORT_EMAIL = 'admin@engage-youth.org';
 const BRAND_NAME = 'Engage Youth Foundation';
