@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { InternalPageShell } from '@/components/layout/InternalPageShell';
@@ -6,6 +7,18 @@ import { ARCHIVES, BLOG_POSTS, CATEGORIES, RECENT_POST_LINKS } from '@/constants
 import { getAllPosts } from '@/sanity/queries';
 import { urlFor } from '@/sanity/client';
 import type { SanityPost } from '@/sanity/types';
+import { JsonLd } from '@/lib/schema/JsonLd';
+import {
+  buildCollectionPageSchema,
+  buildBreadcrumbSchema,
+} from '@/lib/schema/builders';
+
+export const metadata: Metadata = {
+  title: 'News and Social Media',
+  description:
+    'Latest stories, blog posts, and community updates from Engage Youth Foundation. Read about partnerships, impact, and youth-led initiatives.',
+  alternates: { canonical: '/news-and-social-media/' },
+};
 
 const sidebarTitle =
   'mb-6 border-l-4 border-eyf-gold pl-4 font-poppins text-xs font-bold uppercase tracking-wider text-white';
@@ -18,6 +31,9 @@ function formatDate(dateStr: string): string {
 
 export default async function NewsPage() {
   const sanityPosts = await getAllPosts();
+
+  const itemCount =
+    sanityPosts.length > 0 ? sanityPosts.length : BLOG_POSTS.length;
   const hasSanityContent = sanityPosts.length > 0;
 
   const recentLinks = hasSanityContent
@@ -26,6 +42,24 @@ export default async function NewsPage() {
 
   return (
     <InternalPageShell>
+      <JsonLd
+        id="schema-news-collection"
+        data={buildCollectionPageSchema({
+          name: 'News and Social Media — Engage Youth Foundation',
+          description:
+            'Latest stories, blog posts, and community updates from Engage Youth Foundation.',
+          path: '/news-and-social-media/',
+          itemCount,
+        })}
+      />
+      <JsonLd
+        id="schema-news-breadcrumb"
+        data={buildBreadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'News and Social Media' },
+        ])}
+      />
+
       <HeroSection title="News and Social Media" variant="internal" className="bg-transparent" />
 
       <section className="py-12 md:py-20">

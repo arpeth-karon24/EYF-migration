@@ -1,11 +1,31 @@
-'use client';
-
+import type { Metadata } from 'next';
 import { InternalPageShell } from '@/components/layout/InternalPageShell';
 import { HeroSection, ContactForm } from '@/components/sections';
+import { JsonLd } from '@/lib/schema/JsonLd';
+import {
+  buildContactPageSchema,
+  buildBreadcrumbSchema,
+} from '@/lib/schema/builders';
+
+export const metadata: Metadata = {
+  title: 'Contact us',
+  description:
+    'Get in touch with Engage Youth Foundation. Send us a message and we will respond within 1–2 business days.',
+  alternates: { canonical: '/contact-us/' },
+};
 
 export default function ContactPage() {
   return (
     <InternalPageShell>
+      <JsonLd id="schema-contact" data={buildContactPageSchema()} />
+      <JsonLd
+        id="schema-contact-breadcrumb"
+        data={buildBreadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'Contact us' },
+        ])}
+      />
+
       <HeroSection title="Contact us" variant="internal" className="bg-transparent" />
 
       <section className="bg-transparent py-12 md:py-20">

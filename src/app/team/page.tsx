@@ -1,9 +1,22 @@
+import type { Metadata } from 'next';
 import { InternalPageShell } from '@/components/layout/InternalPageShell';
 import { HeroSection, TeamGrid, ContentSection } from '@/components/sections';
 import { BOARD_MEMBERS, ADVISORY_BOARD } from '@/constants/aboutContent';
 import { getBoardMembers, getAdvisoryBoard } from '@/sanity/queries';
 import { urlFor } from '@/sanity/client';
 import type { SanityTeamMember } from '@/sanity/types';
+import { JsonLd } from '@/lib/schema/JsonLd';
+import {
+  buildPersonSchema,
+  buildBreadcrumbSchema,
+} from '@/lib/schema/builders';
+
+export const metadata: Metadata = {
+  title: 'Our Team',
+  description:
+    'Meet the Board of Directors and Advisory Board of Engage Youth Foundation — the people driving programs, mentorship, and community impact.',
+  alternates: { canonical: '/team/' },
+};
 
 function toTeamMember(m: SanityTeamMember) {
   return {
@@ -29,8 +42,32 @@ export default async function TeamPage() {
     ? sanityAdvisory.map(toTeamMember)
     : ADVISORY_BOARD;
 
+  // ── Schema.org — one Person per board/advisory member.
+  // Only emit schemas for members that come from Sanity (those have stable
+  // identifiers + real bios). The static fallback placeholders aren't worth
+  // emitting as Person entities since they're not real individuals yet.
+  const personSchemas = [
+    ...sanityBoard.map((m) =>
+      buildPersonSchema(m, m.photo ? urlFor(m.photo) : null),
+    ),
+    ...sanityAdvisory.map((m) =>
+      buildPersonSchema(m, m.photo ? urlFor(m.photo) : null),
+    ),
+  ];
+
   return (
     <InternalPageShell>
+      <JsonLd
+        id="schema-team-breadcrumb"
+        data={buildBreadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'Our Team' },
+        ])}
+      />
+      {personSchemas.map((schema, i) => (
+        <JsonLd key={`schema-person-${i}`} data={schema} />
+      ))}
+
       <HeroSection title="Our Team" variant="internal" className="bg-transparent" />
 
       <ContentSection centered className="bg-transparent">

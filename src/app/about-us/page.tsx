@@ -1,10 +1,31 @@
+import type { Metadata } from 'next';
 import { HeroSection, ContentSection, GuidelinesList, TeamGrid, MissionVisionSection } from '@/components/sections';
 import { EVOLUTION_SECTIONS, BOARD_MEMBERS, ADVISORY_BOARD } from '@/constants/aboutContent';
 import Image from 'next/image';
+import { JsonLd } from '@/lib/schema/JsonLd';
+import {
+  buildAboutPageSchema,
+  buildBreadcrumbSchema,
+} from '@/lib/schema/builders';
+
+export const metadata: Metadata = {
+  title: 'About us',
+  description:
+    "Learn about Engage Youth Foundation — our mission to empower youth, vision for community change, our evolution, and the board of directors leading the work.",
+  alternates: { canonical: '/about-us/' },
+};
 
 export default function AboutPage() {
   return (
     <div className="relative min-h-screen bg-[#111]">
+      <JsonLd id="schema-about" data={buildAboutPageSchema()} />
+      <JsonLd
+        id="schema-about-breadcrumb"
+        data={buildBreadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'About us' },
+        ])}
+      />
       {/* Full Page Background Image */}
       <div className="fixed inset-0 z-0">
         <Image

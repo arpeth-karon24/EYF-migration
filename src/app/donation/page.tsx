@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { HeroSection, ContentSection } from "@/components/sections";
@@ -12,11 +13,14 @@ import {
   DONATION_MEDIA,
   IN_KIND_ITEMS,
 } from "@/constants/donationContent";
+import { JsonLd } from "@/lib/schema/JsonLd";
+import { buildBreadcrumbSchema } from "@/lib/schema/builders";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Donation",
   description:
-    "Support Engage Youth Foundation through donations, in-kind gifts, and our Amazon wishlist.",
+    "Support Engage Youth Foundation through monetary or in-kind donations. Your contribution funds programs, mentorship, and community impact for the next generation.",
+  alternates: { canonical: "/donation/" },
 };
 
 export default function DonationPage() {
@@ -24,6 +28,14 @@ export default function DonationPage() {
 
   return (
     <InternalPageShell>
+      <JsonLd
+        id="schema-donation-breadcrumb"
+        data={buildBreadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Donation" },
+        ])}
+      />
+
       <HeroSection title={DONATION_HERO.title} variant="internal" className="bg-transparent" />
 
       <ContentSection centered className="bg-transparent">

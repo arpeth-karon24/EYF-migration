@@ -4,6 +4,13 @@ import { InternalPageShell } from "@/components/layout/InternalPageShell";
 import { HeroSection } from "@/components/sections";
 import { FilterableEventsGrid } from "@/components/events/FilterableEventsGrid";
 import { getUpcomingEvents, getPastEvents } from "@/sanity/queries";
+import { urlFor } from "@/sanity/client";
+import { JsonLd } from "@/lib/schema/JsonLd";
+import {
+  buildEventSchema,
+  buildCollectionPageSchema,
+  buildBreadcrumbSchema,
+} from "@/lib/schema/builders";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -36,8 +43,37 @@ export default async function StaticSitePage({ params }: Props) {
   const events =
     slug === "activities" ? await getUpcomingEvents() : await getPastEvents();
 
+  // ── Schema.org — Event schemas for each item + page-level metadata
+  const eventSchemas = events.map((event) =>
+    buildEventSchema(event, event.mainImage ? urlFor(event.mainImage) : null),
+  );
+
   return (
     <InternalPageShell>
+      <JsonLd
+        id={`schema-${slug}-collection`}
+        data={buildCollectionPageSchema({
+          name: `${meta?.title ?? slug} — Engage Youth Foundation`,
+          description:
+            slug === "activities"
+              ? "Upcoming community events, workshops, and gatherings organized by Engage Youth Foundation."
+              : "Past community events and recaps from Engage Youth Foundation.",
+          path: `/${slug}/`,
+          itemCount: events.length,
+        })}
+      />
+      <JsonLd
+        id={`schema-${slug}-breadcrumb`}
+        data={buildBreadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Events", path: "/events/" },
+          { name: meta?.heading ?? slug },
+        ])}
+      />
+      {eventSchemas.map((schema, i) => (
+        <JsonLd key={`schema-event-${i}`} data={schema} />
+      ))}
+
       <HeroSection title={meta?.heading ?? slug} variant="internal" className="bg-transparent" />
 
       <section className="pb-20 pt-4">

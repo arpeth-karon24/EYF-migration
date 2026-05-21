@@ -129,3 +129,30 @@ h1, h2, h3, h4, h5, h6 {
 .eyf-fade-in-down {
   animation: fadeInDown 0.9s ease-out both;
 }
+
+/* ── Accessibility — respect the user's motion preference ──────────────
+   When a user has "Reduce Motion" enabled in their OS, suppress decorative
+   animations and transitions across the site. Functional transitions
+   (like form focus states) stay but at minimal duration. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .eyf-fade-in-down {
+    animation: none !important;
+  }
+}
+
+/* ── Focus visible — clearer keyboard navigation outline ──────────────
+   Default browser outline is often invisible on dark backgrounds.
+   Use a high-contrast gold outline for keyboard focus only. */
+:focus-visible {
+  outline: 2px solid #e0be53;
+  outline-offset: 2px;
+  border-radius: 2px;
+}

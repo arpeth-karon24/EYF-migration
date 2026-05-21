@@ -1,11 +1,27 @@
-'use client';
-
+import type { Metadata } from 'next';
 import { InternalPageShell } from '@/components/layout/InternalPageShell';
 import { HeroSection, VolunteerSupportRequestForm } from '@/components/sections';
+import { JsonLd } from '@/lib/schema/JsonLd';
+import { buildBreadcrumbSchema } from '@/lib/schema/builders';
+
+export const metadata: Metadata = {
+  title: 'Request Volunteer Support',
+  description:
+    'Request volunteer support from Engage Youth Foundation for your event or community initiative. Our team responds within 1–2 business days.',
+  alternates: { canonical: '/request-for-volunteer/' },
+};
 
 export default function RequestVolunteerPage() {
   return (
     <InternalPageShell>
+      <JsonLd
+        id="schema-request-volunteer-breadcrumb"
+        data={buildBreadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'Request Volunteer Support' },
+        ])}
+      />
+
       <HeroSection title="Request Volunteer Support" variant="internal" className="bg-transparent" />
 
       <section className="py-10 md:py-16">

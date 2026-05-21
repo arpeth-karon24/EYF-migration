@@ -8,6 +8,12 @@ import { HeroSection } from "@/components/sections";
 import { BLOG_POSTS, getBlogPostBySlug } from "@/constants/blogContent";
 import { getPostBySlug, getAllPostSlugs } from "@/sanity/queries";
 import { urlFor } from "@/sanity/client";
+import { JsonLd } from "@/lib/schema/JsonLd";
+import {
+  buildBlogPostSchema,
+  buildBreadcrumbSchema,
+} from "@/lib/schema/builders";
+import { absUrl } from "@/lib/schema/siteConfig";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -54,9 +60,23 @@ export default async function NewsArticlePage({ params }: Props) {
 
   if (sanityPost) {
     const imageUrl = sanityPost.mainImage ? urlFor(sanityPost.mainImage) : null;
+    const canonicalPath = `/news-and-social-media/${sanityPost.slug}/`;
 
     return (
       <InternalPageShell>
+        <JsonLd
+          id="schema-blogposting"
+          data={buildBlogPostSchema(sanityPost, imageUrl, canonicalPath)}
+        />
+        <JsonLd
+          id="schema-blogposting-breadcrumb"
+          data={buildBreadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "News and Social Media", path: "/news-and-social-media/" },
+            { name: sanityPost.title },
+          ])}
+        />
+
         <HeroSection title={sanityPost.title} variant="internal" className="bg-transparent" />
 
         <article className="pb-16 pt-4 md:pb-24">
@@ -129,9 +149,34 @@ export default async function NewsArticlePage({ params }: Props) {
   // ── Static fallback ─────────────────────────────────────────────────────────
   const post = getBlogPostBySlug(slug);
   if (!post) notFound();
+  const canonicalPath = `/news-and-social-media/${post.slug}/`;
+
+  // Build a Schema.org-compatible BlogPosting from the legacy static post.
+  // Shape matches SanityPost loosely (just the fields the schema reads).
+  const staticPostSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: post.date,
+    dateModified: post.date,
+    image: [absUrl(post.image)],
+    articleSection: post.category,
+    mainEntityOfPage: { "@type": "WebPage", "@id": absUrl(canonicalPath) },
+  } as Record<string, unknown>;
 
   return (
     <InternalPageShell>
+      <JsonLd id="schema-blogposting-static" data={staticPostSchema} />
+      <JsonLd
+        id="schema-blogposting-static-breadcrumb"
+        data={buildBreadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "News and Social Media", path: "/news-and-social-media/" },
+          { name: post.title },
+        ])}
+      />
+
       <HeroSection title={post.title} variant="internal" className="bg-transparent" />
 
       <article className="pb-16 pt-4 md:pb-24">

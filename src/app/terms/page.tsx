@@ -1,11 +1,27 @@
-'use client';
-
+import type { Metadata } from 'next';
 import { InternalPageShell } from '@/components/layout/InternalPageShell';
 import { HeroSection, ContentSection } from '@/components/sections';
+import { JsonLd } from '@/lib/schema/JsonLd';
+import { buildBreadcrumbSchema } from '@/lib/schema/builders';
+
+export const metadata: Metadata = {
+  title: 'Terms of Service',
+  description:
+    'The terms and conditions governing use of the Engage Youth Foundation website and its services.',
+  alternates: { canonical: '/terms/' },
+};
 
 export default function TermsOfServicePage() {
   return (
     <InternalPageShell>
+      <JsonLd
+        id="schema-terms-breadcrumb"
+        data={buildBreadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'Terms of Service' },
+        ])}
+      />
+
       <HeroSection title="Terms" variant="internal" className="bg-transparent" />
 
       <ContentSection centered={false} className="bg-transparent pb-20">

@@ -4,6 +4,13 @@ import { BlackTitleBar } from '@/components/layout/BlackTitleBar';
 import { HeroSection, ContentSection } from '@/components/sections';
 import { FilterableEventsGrid } from '@/components/events/FilterableEventsGrid';
 import { getUpcomingEvents, getPastEvents } from '@/sanity/queries';
+import { urlFor } from '@/sanity/client';
+import { JsonLd } from '@/lib/schema/JsonLd';
+import {
+  buildEventSchema,
+  buildCollectionPageSchema,
+  buildBreadcrumbSchema,
+} from '@/lib/schema/builders';
 
 /**
  * Events page — full Events index with two filterable sections:
@@ -19,8 +26,35 @@ export default async function EventsPage() {
     getPastEvents(),
   ]);
 
+  // ── Schema.org ─────────────────────────────────────────────────────────
+  // Inject one Event schema per upcoming event (Google Events carousel
+  // eligibility), plus a CollectionPage + BreadcrumbList for the page itself.
+  const eventSchemas = upcomingEvents.map((event) =>
+    buildEventSchema(event, event.mainImage ? urlFor(event.mainImage) : null),
+  );
+
   return (
     <InternalPageShell>
+      <JsonLd
+        id="schema-events-collection"
+        data={buildCollectionPageSchema({
+          name: 'Events — Engage Youth Foundation',
+          description:
+            'Upcoming and past community events, workshops, and gatherings organized by Engage Youth Foundation.',
+          path: '/events/',
+          itemCount: upcomingEvents.length + pastEvents.length,
+        })}
+      />
+      <JsonLd
+        id="schema-events-breadcrumb"
+        data={buildBreadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'Events' },
+        ])}
+      />
+      {eventSchemas.map((schema, i) => (
+        <JsonLd key={`schema-event-${i}`} data={schema} />
+      ))}
       <HeroSection title="Events" variant="internal" className="bg-transparent" />
 
       {/* ── Upcoming ─────────────────────────────────────────────────── */}

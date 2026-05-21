@@ -4,6 +4,11 @@ import "./globals.css";
 import { SiteHeader } from "@/components/navbar/SiteHeader";
 import { SiteFooter } from "@/components/footer/SiteFooter";
 import { GoogleAnalytics } from "@/services/GoogleAnalytics";
+import { JsonLd } from "@/lib/schema/JsonLd";
+import {
+  buildOrganizationSchema,
+  buildWebSiteSchema,
+} from "@/lib/schema/builders";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -74,7 +79,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-US" className={`${poppins.variable} ${montserrat.variable} ${openSans.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Sitewide Schema.org — Organization + WebSite. Other schemas
+            (Event, FAQPage, BlogPosting, etc.) are injected per-page. */}
+        <JsonLd id="schema-organization" data={buildOrganizationSchema()} />
+        <JsonLd id="schema-website" data={buildWebSiteSchema()} />
+      </head>
       <body className="min-h-dvh">
+        {/* Accessibility — skip-to-content link for keyboard users */}
+        <a
+          href="#content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[1000] focus:rounded focus:bg-eyf-gold focus:px-4 focus:py-2 focus:font-poppins focus:text-sm focus:font-bold focus:text-black"
+        >
+          Skip to main content
+        </a>
         <GoogleAnalytics />
         <div id="page" className="flex min-h-dvh flex-col">
           <SiteHeader />

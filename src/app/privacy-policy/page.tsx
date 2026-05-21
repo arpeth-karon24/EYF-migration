@@ -1,11 +1,27 @@
-'use client';
-
+import type { Metadata } from 'next';
 import { InternalPageShell } from '@/components/layout/InternalPageShell';
 import { HeroSection, ContentSection } from '@/components/sections';
+import { JsonLd } from '@/lib/schema/JsonLd';
+import { buildBreadcrumbSchema } from '@/lib/schema/builders';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description:
+    'How Engage Youth Foundation collects, uses, and protects your personal information when you interact with our website.',
+  alternates: { canonical: '/privacy-policy/' },
+};
 
 export default function PrivacyPolicyPage() {
   return (
     <InternalPageShell>
+      <JsonLd
+        id="schema-privacy-breadcrumb"
+        data={buildBreadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'Privacy Policy' },
+        ])}
+      />
+
       <HeroSection title="Privacy Policy" variant="internal" className="bg-transparent" />
 
       <ContentSection centered={false} className="bg-transparent pb-20">
