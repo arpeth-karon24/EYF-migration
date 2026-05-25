@@ -90,12 +90,21 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       env.RESEND_API_KEY
     );
 
-    if (!emailResults.user) {
-      console.error('Failed to send newsletter confirmation email', emailResults);
+    // ── Email handling — admin notification is CRITICAL, user confirmation is not.
+    //
+    // Why: when Resend's sending domain isn't verified yet, sending TO addresses
+    // outside the account owner's domain fails. We don't want that side-effect
+    // to crash the form — the lead is already captured (admin notified), the user
+    // just doesn't receive a receipt. Once the sending domain is verified in
+    // Resend, both emails will succeed normally and this becomes a no-op.
+
+    if (!emailResults.admin) {
+      // Admin notification failed = lead is at risk of being lost = real problem
+      console.error('Failed to send admin notification email', emailResults);
       return new Response(
         JSON.stringify(buildErrorResponse(
-          'Subscription request received but failed to send confirmation. Please try again.',
-          'EMAIL_SEND_FAILED'
+          'Subscription failed to register. Please try again or email us directly.',
+          'ADMIN_EMAIL_FAILED'
         )),
         {
           status: 500,
@@ -103,13 +112,19 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         }
       );
     }
-    if (!emailResults.admin) {
-      console.error('Failed to send admin notification email', emailResults);
+
+    if (!emailResults.user) {
+      // User confirmation failed but admin was notified = lead is safe.
+      // Log it, continue, and treat the submission as successful from the user's POV.
+      console.warn(
+        'User confirmation email failed (likely Resend unverified-domain block) — admin was still notified',
+        emailResults,
+      );
     }
 
     return new Response(
       JSON.stringify(buildSuccessResponse('Thank you for subscribing to our newsletter!', {
-        submissionId: emailResults.user.id,
+        submissionId: emailResults.user?.id ?? emailResults.admin.id,
       })),
       {
         status: 200,

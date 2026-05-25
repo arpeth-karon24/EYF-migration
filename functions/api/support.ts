@@ -147,12 +147,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       env.RESEND_API_KEY
     );
 
-    if (!emailResults.user) {
-      console.error('Failed to send support request confirmation email', emailResults);
+    // Admin notification is CRITICAL; user confirmation is nice-to-have.
+    if (!emailResults.admin) {
+      console.error('Failed to send admin notification email', emailResults);
       return new Response(
         JSON.stringify(buildErrorResponse(
-          'Request received but failed to send confirmation. Please try again or contact us directly.',
-          'EMAIL_SEND_FAILED'
+          'Request failed to register. Please try again or contact us directly.',
+          'ADMIN_EMAIL_FAILED'
         )),
         {
           status: 500,
@@ -160,13 +161,17 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         }
       );
     }
-    if (!emailResults.admin) {
-      console.error('Failed to send admin notification email', emailResults);
+
+    if (!emailResults.user) {
+      console.warn(
+        'User confirmation email failed (likely Resend unverified-domain block) — admin was still notified',
+        emailResults,
+      );
     }
 
     return new Response(
       JSON.stringify(buildSuccessResponse('Your support request has been received. We will confirm volunteer availability shortly.', {
-        submissionId: emailResults.user.id,
+        submissionId: emailResults.user?.id ?? emailResults.admin.id,
       })),
       {
         status: 200,

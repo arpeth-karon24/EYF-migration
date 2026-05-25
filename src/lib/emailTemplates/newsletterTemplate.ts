@@ -7,7 +7,6 @@ import {
   baseEmailTemplate,
   createInfoBlock,
   createParagraph,
-  createHighlight,
   createButton,
   createDivider,
 } from './baseTemplate';
@@ -21,8 +20,9 @@ export function newsletterUserEmail(email: string): string {
     ${createParagraph(
       `You're now subscribed to the Engage Youth Foundation newsletter. We'll keep you in the loop on programs, volunteer opportunities, events, and the stories of the youth we serve.`
     )}
-
-    ${createHighlight('Expect occasional emails — no spam, no daily blasts. Just meaningful updates from a community working to empower the next generation.')}
+    ${createParagraph(
+      'Expect occasional emails — no spam, no daily blasts. Just meaningful updates from a community working to empower the next generation.'
+    )}
 
     ${createInfoBlock('Subscribed email', email)}
 

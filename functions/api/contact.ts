@@ -121,13 +121,16 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       env.RESEND_API_KEY
     );
 
-    // Check if at least the user email was sent
-    if (!emailResults.user) {
-      console.error('Failed to send confirmation email', emailResults);
+    // Admin notification is CRITICAL (don't lose the lead); user confirmation
+    // is a nice-to-have. If user confirmation fails (Resend free-tier block
+    // for unverified domains), log it but still return success — admin has
+    // the lead.
+    if (!emailResults.admin) {
+      console.error('Failed to send admin notification email', emailResults);
       return new Response(
         JSON.stringify(buildErrorResponse(
-          'Message received but failed to send confirmation email. Please try again or contact us directly.',
-          'EMAIL_SEND_FAILED'
+          'Message failed to send. Please try again or contact us directly.',
+          'ADMIN_EMAIL_FAILED'
         )),
         {
           status: 500,
@@ -135,13 +138,17 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         }
       );
     }
-    if (!emailResults.admin) {
-      console.error('Failed to send admin notification email', emailResults);
+
+    if (!emailResults.user) {
+      console.warn(
+        'User confirmation email failed (likely Resend unverified-domain block) — admin was still notified',
+        emailResults,
+      );
     }
 
     return new Response(
       JSON.stringify(buildSuccessResponse('Your message has been received. We will respond shortly.', {
-        submissionId: emailResults.user.id,
+        submissionId: emailResults.user?.id ?? emailResults.admin.id,
       })),
       {
         status: 200,
