@@ -10,7 +10,10 @@ export const PRIMARY_NAV: NavItem[] = [
     href: "/about-us",
     children: [
       { label: "Mission and Vision", href: "/about-us#vision" },
-      { label: "Teams", href: "/about-us#board" },
+      // "Teams" routes to the dedicated /team page (Board of Directors + Advisory Board)
+      // rather than the in-page anchor on About — the dedicated page is responsive,
+      // has its own metadata, and is reachable directly via /team URL too.
+      { label: "Teams", href: "/team" },
       { label: "News and Social Media", href: "/news-and-social-media" },
     ],
   },

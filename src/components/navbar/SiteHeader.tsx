@@ -7,6 +7,7 @@ import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { cn } from "@/lib/cn";
 import { PRIMARY_NAV, VOLUNTEER_CTA } from "@/constants/navigation";
 import { SITE } from "@/constants/homeContent";
+import { SearchTrigger } from "@/components/search/SearchTrigger";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -75,6 +76,10 @@ export function SiteHeader() {
                   )}
                 </li>
               ))}
+              {/* Search trigger — opens search dialog. Sits between nav and CTA on desktop. */}
+              <li className="ml-3">
+                <SearchTrigger />
+              </li>
               <li className="ml-2">
                 <Link
                   href={VOLUNTEER_CTA.href}
@@ -88,9 +93,12 @@ export function SiteHeader() {
               </li>
             </ul>
 
-            <button
+            {/* Mobile: search button next to hamburger */}
+            <div className="flex items-center gap-2 navlg:hidden">
+              <SearchTrigger />
+              <button
               type="button"
-              className="navlg:hidden rounded border border-white/20 px-3 py-2 text-white"
+              className="rounded border border-white/20 px-3 py-2 text-white"
               aria-expanded={open}
               aria-controls="mobile-primary-nav"
               onClick={() => setOpen((v) => !v)}
@@ -105,6 +113,7 @@ export function SiteHeader() {
                 />
               </svg>
             </button>
+            </div>
           </div>
         </div>
 

@@ -6,3 +6,9 @@
 /news-and-social-media/post-1 /news-and-social-media/child-rights-and-you-blog/ 301
 /news-and-social-media/post-2 /news-and-social-media/akshaya-patra-blog/ 301
 /news-and-social-media/post-3 /news-and-social-media/narayan-seva-sansthan/ 301
+
+# Legacy WordPress RSS path — preserve subscriber URLs from the old site
+/feed /feed.xml 301
+/feed/ /feed.xml 301
+/rss /feed.xml 301
+/rss.xml /feed.xml 301

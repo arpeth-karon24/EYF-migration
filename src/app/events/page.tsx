@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { InternalPageShell } from '@/components/layout/InternalPageShell';
 import { BlackTitleBar } from '@/components/layout/BlackTitleBar';
@@ -11,6 +12,13 @@ import {
   buildCollectionPageSchema,
   buildBreadcrumbSchema,
 } from '@/lib/schema/builders';
+
+export const metadata: Metadata = {
+  title: 'Events',
+  description:
+    'Browse upcoming and past community events, workshops, mentorship programs, and gatherings organized by Engage Youth Foundation. Filter by location, category, or date.',
+  alternates: { canonical: '/events/' },
+};
 
 /**
  * Events page — full Events index with two filterable sections:

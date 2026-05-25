@@ -54,23 +54,17 @@ export const BOARD_MEMBERS = [
   },
 ];
 
-export const ADVISORY_BOARD = [
-  {
-    id: "advisor-1",
-    name: "Advisory Board Member",
-    role: "Advisor",
-    image: "/images/about/board-member-2.jpg",
-  },
-  {
-    id: "advisor-2",
-    name: "Advisory Board Member",
-    role: "Advisor",
-    image: "/images/about/board-member-3.jpeg",
-  },
-  {
-    id: "advisor-3",
-    name: "Advisory Board Member",
-    role: "Advisor",
-    image: "/images/about/board-member-4.jpg",
-  },
-];
+/**
+ * Advisory Board — managed entirely via Sanity CMS (memberType: "advisory").
+ *
+ * Kept as an empty array so the legacy import path still works for any
+ * server-component fallback logic. When the Sanity query returns no
+ * results, components should render a "members coming soon" placeholder
+ * instead of synthesising fake names.
+ */
+export const ADVISORY_BOARD: Array<{
+  id: string;
+  name: string;
+  role: string;
+  image: string;
+}> = [];

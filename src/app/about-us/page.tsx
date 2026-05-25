@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { HeroSection, ContentSection, GuidelinesList, TeamGrid, MissionVisionSection } from '@/components/sections';
-import { EVOLUTION_SECTIONS, BOARD_MEMBERS, ADVISORY_BOARD } from '@/constants/aboutContent';
+import { EVOLUTION_SECTIONS, BOARD_MEMBERS } from '@/constants/aboutContent';
 import Image from 'next/image';
 import { JsonLd } from '@/lib/schema/JsonLd';
 import {
@@ -92,20 +92,17 @@ export default function AboutPage() {
           className="bg-transparent"
         />
 
-        {/* Board Sections (Black Bar Format) */}
-        <div className="py-0 space-y-12 mb-20">
-          <TeamGrid 
-            title="Board of Directors" 
-            members={BOARD_MEMBERS} 
+        {/* Board section — anchor #board lets older links/nav deep-link here.
+            Note: the dedicated /team page is the canonical home for the full
+            team listing (Board of Directors + Advisory Board with empty state). */}
+        <div id="board" className="py-0 space-y-12 mb-20">
+          <TeamGrid
+            title="Board of Directors"
+            members={BOARD_MEMBERS}
             backgroundColor="dark"
-            showRoleOnHover={false}
           />
-
-          <TeamGrid 
-            title="Advisory Board" 
-            members={ADVISORY_BOARD} 
-            backgroundColor="dark" 
-          />
+          {/* Advisory Board intentionally omitted on About — see /team page
+              for the full advisory board listing (or its empty state). */}
         </div>
       </div>
     </div>

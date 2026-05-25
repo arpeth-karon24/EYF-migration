@@ -41,7 +41,6 @@ export const metadata: Metadata = {
   },
   description:
     "501(c)(3) non-profit engaging, empowering, and mobilizing the next generation through programs, mentorship, and community impact in the Pacific Northwest.",
-  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -63,6 +62,16 @@ export const metadata: Metadata = {
       { url: "/images/logo/favicon-192x192.png", sizes: "192x192" },
     ],
     apple: "/images/logo/apple-touch-icon.png",
+  },
+  // RSS feed auto-discovery — feed readers like Feedly, Inoreader, and Apple News
+  // pick up this hint and offer one-click subscription.
+  alternates: {
+    canonical: "/",
+    types: {
+      "application/rss+xml": [
+        { url: "/feed.xml", title: "Engage Youth Foundation — News" },
+      ],
+    },
   },
 };
 

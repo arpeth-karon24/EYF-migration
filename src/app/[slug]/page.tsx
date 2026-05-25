@@ -14,9 +14,22 @@ import {
 
 type Props = { params: Promise<{ slug: string }> };
 
-const SLUG_META: Record<string, { title: string; heading: string }> = {
-  activities:    { title: "Upcoming / Ongoing Events", heading: "Upcoming Events" },
-  "past-events": { title: "Past Events",               heading: "Past Events"     },
+const SLUG_META: Record<
+  string,
+  { title: string; heading: string; description: string }
+> = {
+  activities: {
+    title: "Upcoming / Ongoing Events",
+    heading: "Upcoming Events",
+    description:
+      "Upcoming and ongoing community events, workshops, and gatherings organized by Engage Youth Foundation. Filter by location, category, or date to find what's relevant to you.",
+  },
+  "past-events": {
+    title: "Past Events",
+    heading: "Past Events",
+    description:
+      "Archive of past Engage Youth Foundation events — community projects, mentorship programs, workshops, and gatherings. Browse our recent community impact.",
+  },
 };
 
 export function generateStaticParams() {
@@ -28,7 +41,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const meta = SLUG_META[slug];
   return {
     title: meta?.title ?? slug,
-    alternates: { canonical: `/${slug}` },
+    description:
+      meta?.description ??
+      "Engage Youth Foundation — empowering youth through programs, mentorship, and community impact.",
+    alternates: { canonical: `/${slug}/` },
   };
 }
 
