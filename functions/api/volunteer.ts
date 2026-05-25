@@ -152,7 +152,6 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       env.RESEND_API_KEY
     );
 
-    // Admin notification is CRITICAL; user confirmation is nice-to-have.
     if (!emailResults.admin) {
       console.error('Failed to send admin notification email', emailResults);
       return new Response(
@@ -168,9 +167,16 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     if (!emailResults.user) {
-      console.warn(
-        'User confirmation email failed (likely Resend unverified-domain block) — admin was still notified',
-        emailResults,
+      console.error('Failed to send user confirmation email', emailResults);
+      return new Response(
+        JSON.stringify(buildErrorResponse(
+          'Registration failed to register. Please try again or contact us directly.',
+          'USER_EMAIL_FAILED'
+        )),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
       );
     }
 

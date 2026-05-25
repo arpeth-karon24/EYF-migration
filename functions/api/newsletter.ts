@@ -90,16 +90,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       env.RESEND_API_KEY
     );
 
-    // ── Email handling — admin notification is CRITICAL, user confirmation is not.
-    //
-    // Why: when Resend's sending domain isn't verified yet, sending TO addresses
-    // outside the account owner's domain fails. We don't want that side-effect
-    // to crash the form — the lead is already captured (admin notified), the user
-    // just doesn't receive a receipt. Once the sending domain is verified in
-    // Resend, both emails will succeed normally and this becomes a no-op.
-
     if (!emailResults.admin) {
-      // Admin notification failed = lead is at risk of being lost = real problem
       console.error('Failed to send admin notification email', emailResults);
       return new Response(
         JSON.stringify(buildErrorResponse(
@@ -114,11 +105,16 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     if (!emailResults.user) {
-      // User confirmation failed but admin was notified = lead is safe.
-      // Log it, continue, and treat the submission as successful from the user's POV.
-      console.warn(
-        'User confirmation email failed (likely Resend unverified-domain block) — admin was still notified',
-        emailResults,
+      console.error('Failed to send user confirmation email', emailResults);
+      return new Response(
+        JSON.stringify(buildErrorResponse(
+          'Subscription failed to register. Please try again or email us directly.',
+          'USER_EMAIL_FAILED'
+        )),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
       );
     }
 
