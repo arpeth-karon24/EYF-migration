@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import { cn } from "@/lib/cn";
 import { DEFAULT_INTERNAL_PAGE_BG } from "@/constants/internalPage";

@@ -66,6 +66,8 @@ export default function DonationPage() {
                   src={DONATION_MEDIA.inKindHero}
                   alt="Examples of in-kind donations we accept"
                   fill
+                  priority
+                  fetchPriority="high"
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
