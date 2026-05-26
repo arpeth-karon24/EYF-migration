@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { InternalPageShell } from '@/components/layout/InternalPageShell';
 import { HeroSection, ContentSection, GuidelinesList } from '@/components/sections';
@@ -22,8 +23,47 @@ interface Props {
   upcomingEvents: SanityEvent[];
 }
 
+/**
+ * Reads the ?event=<id> query param so the event detail page can deep-link
+ * straight into the volunteer form with the right event preselected.
+ * Wrapped in a Suspense boundary because useSearchParams() requires it
+ * under Next.js static export.
+ */
+function EventDeepLinkReader({
+  upcomingEvents,
+  onMatchFound,
+}: {
+  upcomingEvents: SanityEvent[];
+  onMatchFound: (eventId: string) => void;
+}) {
+  const searchParams = useSearchParams();
+  const eventIdFromUrl = searchParams.get('event');
+
+  useEffect(() => {
+    if (!eventIdFromUrl) return;
+    // Only auto-open if the event ID actually matches a known upcoming event.
+    // Stale or invalid IDs are silently ignored so the page still renders normally.
+    const match = upcomingEvents.find((evt) => evt._id === eventIdFromUrl);
+    if (match) onMatchFound(match._id);
+  }, [eventIdFromUrl, upcomingEvents, onMatchFound]);
+
+  return null;
+}
+
 export default function VolunteerPageClient({ upcomingEvents }: Props) {
   const [registrationOpen, setRegistrationOpen] = useState(false);
+  const [prefillEventId, setPrefillEventId] = useState<string | undefined>(undefined);
+
+  const handleEventDeepLink = (eventId: string) => {
+    setPrefillEventId(eventId);
+    setRegistrationOpen(true);
+  };
+
+  // Clear the prefill when the modal closes so a fresh open doesn't reuse it.
+  const handleClose = () => {
+    setRegistrationOpen(false);
+    setPrefillEventId(undefined);
+  };
 
   return (
     <InternalPageShell>
@@ -36,10 +76,18 @@ export default function VolunteerPageClient({ upcomingEvents }: Props) {
         className="bg-transparent"
       />
 
+      <Suspense fallback={null}>
+        <EventDeepLinkReader
+          upcomingEvents={upcomingEvents}
+          onMatchFound={handleEventDeepLink}
+        />
+      </Suspense>
+
       <VolunteerRegistrationModal
         open={registrationOpen}
-        onClose={() => setRegistrationOpen(false)}
+        onClose={handleClose}
         upcomingEvents={upcomingEvents}
+        initialEventId={prefillEventId}
       />
 
       <ContentSection centered className="bg-transparent">

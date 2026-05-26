@@ -13,9 +13,15 @@ interface VolunteerRegistrationModalProps {
    * provided, the form falls back to a small set of hardcoded options.
    */
   upcomingEvents?: SanityEvent[];
+  /**
+   * Pre-selected event ID for the "Event title" dropdown. Used when the
+   * user lands here from a specific event's detail page so the right
+   * event is selected automatically.
+   */
+  initialEventId?: string;
 }
 
-export default function VolunteerRegistrationModal({ open, onClose, upcomingEvents }: VolunteerRegistrationModalProps) {
+export default function VolunteerRegistrationModal({ open, onClose, upcomingEvents, initialEventId }: VolunteerRegistrationModalProps) {
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -80,7 +86,10 @@ export default function VolunteerRegistrationModal({ open, onClose, upcomingEven
         </div>
 
         <div className="overflow-y-auto px-6 py-6 md:px-8 md:py-7">
-          <VolunteerRegistrationForm upcomingEvents={upcomingEvents} />
+          <VolunteerRegistrationForm
+            upcomingEvents={upcomingEvents}
+            initialEventId={initialEventId}
+          />
         </div>
       </div>
     </div>,

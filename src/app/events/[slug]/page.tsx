@@ -209,17 +209,28 @@ export default async function EventDetailPage({ params }: Props) {
                 </p>
               )}
 
-              {/* CTA — Register (only for non-cancelled upcoming events with a registration URL) */}
-              {isUpcoming && event.registrationUrl && (
-                <div className="mt-10 border-t border-white/10 pt-8">
-                  <a
-                    href={event.registrationUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+              {/* CTA — internal volunteer registration prefilled with this event.
+                  Only shown for upcoming, non-cancelled events. The eventId is
+                  passed via the ?event= query param so VolunteerPageClient can
+                  auto-open the modal and pre-select this event in the dropdown. */}
+              {isUpcoming && (
+                <div className="mt-10 flex flex-wrap items-center gap-4 border-t border-white/10 pt-8">
+                  <Link
+                    href={`/volunteer-with-us/?event=${encodeURIComponent(event._id)}`}
                     className="inline-block rounded-lg bg-eyf-gold px-6 py-3 font-poppins text-sm font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-80"
                   >
                     Register for this event
-                  </a>
+                  </Link>
+                  {event.registrationUrl && (
+                    <a
+                      href={event.registrationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block border-b border-white/30 pb-0.5 font-poppins text-xs font-bold uppercase tracking-widest text-white/70 transition-colors hover:border-eyf-gold hover:text-eyf-gold"
+                    >
+                      External registration page →
+                    </a>
+                  )}
                 </div>
               )}
             </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent, useRef, useMemo, type ReactNode } from 'react';
+import { useState, FormEvent, useRef, useMemo, useEffect, type ReactNode } from 'react';
 import {
   User, Mail, Phone, Calendar, MapPin, Clock, Star, Heart, Shield, ChevronDown,
 } from 'lucide-react';
@@ -17,9 +17,16 @@ interface VolunteerRegistrationFormProps {
    * constants when omitted or empty (e.g. on the older static path).
    */
   upcomingEvents?: SanityEvent[];
+  /**
+   * Pre-select an event in the "Event title" dropdown. Used when the
+   * user arrives from a specific event's detail page so they don't have
+   * to manually find/select the event again. If the ID doesn't match
+   * any available option, this is silently ignored.
+   */
+  initialEventId?: string;
 }
 
-export default function VolunteerRegistrationForm({ onSuccess, upcomingEvents }: VolunteerRegistrationFormProps) {
+export default function VolunteerRegistrationForm({ onSuccess, upcomingEvents, initialEventId }: VolunteerRegistrationFormProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { token: turnstileToken, reset: resetTurnstile } = useTurnstile(containerRef, 'dark');
   const { isLoading, message, submit, clearMessage } = useFormSubmission({ endpoint: '/api/volunteer' });
@@ -42,10 +49,22 @@ export default function VolunteerRegistrationForm({ onSuccess, upcomingEvents }:
   }, [upcomingEvents]);
 
   const [formData, setFormData] = useState({
-    name: '', email: '', contactNumber: '', eventTitle: '',
+    name: '', email: '', contactNumber: '',
+    eventTitle: initialEventId ?? '',
     city: '', availability: '', skillsAndInterests: '',
     motivation: '', emergencyContact: '', agreeToGuidelines: false,
   });
+
+  // If initialEventId arrives after first render (e.g. modal re-opened with
+  // a different event), sync it into the dropdown. Only updates when the
+  // prop changes AND the option actually exists in the current dropdown list.
+  useEffect(() => {
+    if (!initialEventId) return;
+    const matches = eventOptions.some((o) => o.value === initialEventId);
+    if (matches) {
+      setFormData((prev) => ({ ...prev, eventTitle: initialEventId }));
+    }
+  }, [initialEventId, eventOptions]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
