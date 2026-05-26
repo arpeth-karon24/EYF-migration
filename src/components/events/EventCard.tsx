@@ -26,28 +26,50 @@ interface Props {
  * Renders Sanity image (with placeholder fallback), category/type tags,
  * title, date, location, description, and a Register CTA for upcoming
  * events that have a registration URL.
+ *
+ * Cancelled events render with a "CANCELLED" badge, dimmed opacity,
+ * strikethrough title, and a cancellation notice in place of the CTA.
+ * The Register button is suppressed regardless of registrationUrl.
  */
 export function EventCard({ event }: Props) {
   const imageUrl = event.mainImage ? urlFor(event.mainImage) : null;
+  const isCancelled = event.status === "cancelled";
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-white/5 bg-[#1c1c1c]/80 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl">
+    <article
+      className={`group relative overflow-hidden rounded-2xl border border-white/5 bg-[#1c1c1c]/80 shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl ${
+        isCancelled ? "opacity-75" : ""
+      }`}
+      aria-label={isCancelled ? `${event.title} — cancelled` : event.title}
+    >
       {imageUrl ? (
         <div className="relative h-48 w-full overflow-hidden">
           <Image
             src={imageUrl}
             alt={event.title}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
+              isCancelled ? "grayscale" : ""
+            }`}
             sizes="(max-width: 768px) 100vw, 33vw"
           />
+          {isCancelled && (
+            <span className="absolute right-3 top-3 z-10 rounded-md bg-red-600/95 px-3 py-1 font-poppins text-[10px] font-bold uppercase tracking-widest text-white shadow-lg">
+              Cancelled
+            </span>
+          )}
         </div>
       ) : (
-        <div className="flex h-48 w-full items-center justify-center bg-gradient-to-br from-[#2c2c2c] to-[#1a1a1a]">
+        <div className="relative flex h-48 w-full items-center justify-center bg-gradient-to-br from-[#2c2c2c] to-[#1a1a1a]">
           <svg className="h-16 w-16 opacity-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1"
               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
+          {isCancelled && (
+            <span className="absolute right-3 top-3 z-10 rounded-md bg-red-600/95 px-3 py-1 font-poppins text-[10px] font-bold uppercase tracking-widest text-white shadow-lg">
+              Cancelled
+            </span>
+          )}
         </div>
       )}
 
@@ -64,13 +86,19 @@ export function EventCard({ event }: Props) {
           </div>
         )}
 
-        <h3 className="mb-2 font-montserrat text-lg font-bold leading-snug text-white transition-colors group-hover:text-eyf-gold">
+        <h3
+          className={`mb-2 font-montserrat text-lg font-bold leading-snug text-white transition-colors group-hover:text-eyf-gold ${
+            isCancelled ? "line-through decoration-white/40" : ""
+          }`}
+        >
           {event.title}
         </h3>
 
         <p className="mb-2 flex items-center gap-1.5 font-opensans text-xs text-white/50">
           <span>📅</span>
-          <span>{formatEventDate(event.startDate, event.endDate)}</span>
+          <span className={isCancelled ? "line-through decoration-white/30" : ""}>
+            {formatEventDate(event.startDate, event.endDate)}
+          </span>
         </p>
 
         <p className="mb-4 flex items-center gap-1.5 font-opensans text-xs text-white/50">
@@ -84,15 +112,24 @@ export function EventCard({ event }: Props) {
           </p>
         )}
 
-        {event.registrationUrl && event.status === "upcoming" && (
-          <a
-            href={event.registrationUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block rounded-lg bg-eyf-gold px-4 py-2 font-poppins text-xs font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-80"
-          >
-            Register
-          </a>
+        {isCancelled ? (
+          <div className="rounded-lg border border-red-500/30 bg-red-950/20 px-4 py-3 font-opensans text-xs leading-relaxed text-red-200/90">
+            <strong className="font-poppins font-bold uppercase tracking-widest text-red-300">
+              This event has been cancelled.
+            </strong>
+            <span className="ml-1">Check back for rescheduling information.</span>
+          </div>
+        ) : (
+          event.registrationUrl && event.status === "upcoming" && (
+            <a
+              href={event.registrationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block rounded-lg bg-eyf-gold px-4 py-2 font-poppins text-xs font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-80"
+            >
+              Register
+            </a>
+          )
         )}
       </div>
     </article>
