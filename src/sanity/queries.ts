@@ -111,6 +111,33 @@ export async function getAllEventsCount(): Promise<number | null> {
   return client.fetch<number>(`count(*[_type == "event"])`);
 }
 
+/**
+ * Fetch a single event by slug — used by the /events/[slug]/ detail page.
+ * Returns null if not found or Sanity isn't configured.
+ */
+export async function getEventBySlug(slug: string): Promise<SanityEvent | null> {
+  const client = getSanityClient();
+  if (!client) return null;
+  const result = await client.fetch<SanityEvent | null>(
+    `*[_type == "event" && slug.current == $slug][0] { ${EVENT_FIELDS} }`,
+    { slug }
+  );
+  return result ?? null;
+}
+
+/**
+ * List every event slug — used by generateStaticParams for the
+ * /events/[slug]/ route under static export.
+ */
+export async function getAllEventSlugs(): Promise<string[]> {
+  const client = getSanityClient();
+  if (!client) return [];
+  const result = await client.fetch<{ slug: string }[]>(
+    `*[_type == "event" && defined(slug.current)] { "slug": slug.current }`
+  );
+  return result.map((r) => r.slug);
+}
+
 // ─── Team Members ─────────────────────────────────────────────────────────────
 
 export async function getBoardMembers(): Promise<SanityTeamMember[]> {

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { SanityEvent } from "@/sanity/types";
 import { urlFor } from "@/sanity/client";
 
@@ -113,7 +114,7 @@ export function EventCard({ event }: Props) {
         )}
 
         {isCancelled ? (
-          <div className="rounded-lg border border-red-500/30 bg-red-950/20 px-4 py-3 font-opensans text-xs leading-relaxed text-red-200/90">
+          <div className="mb-4 rounded-lg border border-red-500/30 bg-red-950/20 px-4 py-3 font-opensans text-xs leading-relaxed text-red-200/90">
             <strong className="font-poppins font-bold uppercase tracking-widest text-red-300">
               This event has been cancelled.
             </strong>
@@ -125,11 +126,25 @@ export function EventCard({ event }: Props) {
               href={event.registrationUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block rounded-lg bg-eyf-gold px-4 py-2 font-poppins text-xs font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-80"
+              className="mb-4 inline-block rounded-lg bg-eyf-gold px-4 py-2 font-poppins text-xs font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-80"
             >
               Register
             </a>
           )
+        )}
+
+        {/* Read more link — always shown, opens the full event detail page */}
+        {event.slug && (
+          <div className={isCancelled || (event.registrationUrl && event.status === "upcoming") ? "pt-1" : ""}>
+            <Link
+              href={`/events/${event.slug}/`}
+              className="inline-flex items-center gap-1 border-b border-white/20 pb-0.5 font-poppins text-[11px] font-bold uppercase tracking-widest text-white transition-all hover:border-eyf-gold hover:text-eyf-gold"
+              aria-label={`Read more about ${event.title}`}
+            >
+              Read more
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
         )}
       </div>
     </article>
