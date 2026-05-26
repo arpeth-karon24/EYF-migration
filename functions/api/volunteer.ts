@@ -17,11 +17,17 @@ import { validateTurnstileToken } from '@/lib/turnstile';
 import { sendBatchEmails } from '@/lib/resend';
 import { volunteerRegistrationUserEmail, volunteerRegistrationAdminEmail } from '@/lib/emailTemplates';
 import { ValidationError } from '@/types/api';
+import { incrementVolunteerCount } from '../lib/sanityStats';
 
 interface Env {
   ADMIN_EMAIL?: string;
   RESEND_API_KEY?: string;
   TURNSTILE_SECRET_KEY?: string;
+  // Sanity write credentials — used to bump the homepage volunteerCount.
+  // Set in Cloudflare Pages → Settings → Environment Variables.
+  SANITY_WRITE_TOKEN?: string;
+  NEXT_PUBLIC_SANITY_PROJECT_ID?: string;
+  NEXT_PUBLIC_SANITY_DATASET?: string;
 }
 
 interface VolunteerRequest {
@@ -179,6 +185,14 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         }
       );
     }
+
+    // ── Bump the homepage volunteerCount in Sanity ──────────────────────────
+    // Fire-and-forget: failures here are logged but never affect the user
+    // response. The lead is already captured (admin notified, user confirmed),
+    // so an out-of-sync stat is a much smaller problem than a 500 to the user.
+    incrementVolunteerCount(env).catch((err) => {
+      console.error('Failed to increment Sanity volunteerCount:', err);
+    });
 
     return new Response(
       JSON.stringify(buildSuccessResponse('Your volunteer registration has been received. We will be in touch shortly.', {

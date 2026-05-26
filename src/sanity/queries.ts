@@ -1,4 +1,4 @@
-import type { SanityPost, SanityEvent, SanityTeamMember } from './types';
+import type { SanityPost, SanityEvent, SanityTeamMember, SanitySiteStats } from './types';
 import { getSanityClient } from './client';
 
 // ─── GROQ Queries ────────────────────────────────────────────────────────────
@@ -154,4 +154,27 @@ export async function getAdvisoryBoard(): Promise<SanityTeamMember[]> {
   return client.fetch<SanityTeamMember[]>(
     `*[_type == "teamMember" && memberType == "advisory"] | order(order asc) { ${TEAM_FIELDS} }`
   );
+}
+
+// ─── Site Stats (homepage counters) ───────────────────────────────────────────
+
+/**
+ * Fetch the singleton "Site Stats" document used by the homepage counters.
+ * Returns null if Sanity isn't configured OR the singleton hasn't been
+ * created yet — the homepage falls back to HOME_STATS defaults in that case.
+ *
+ * Document ID is hardcoded to "siteStats" so we don't need a slug lookup.
+ */
+export async function getSiteStats(): Promise<SanitySiteStats | null> {
+  const client = getSanityClient();
+  if (!client) return null;
+  const result = await client.fetch<SanitySiteStats | null>(
+    `*[_type == "siteStats" && _id == "siteStats"][0] {
+      _id,
+      volunteerCount,
+      volunteerHours,
+      lastUpdated
+    }`
+  );
+  return result ?? null;
 }

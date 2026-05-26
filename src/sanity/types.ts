@@ -44,3 +44,11 @@ export interface SanityTeamMember {
   bio?: string;
   order: number;
 }
+
+/** Singleton document for live homepage counters. */
+export interface SanitySiteStats {
+  _id: string;
+  volunteerCount: number;
+  volunteerHours: number;
+  lastUpdated?: string;
+}

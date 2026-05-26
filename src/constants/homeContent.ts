@@ -23,10 +23,21 @@ export const HERO_SLIDES = [
   },
 ] as const;
 
+/**
+ * Homepage stats labels + safe fallback values.
+ *
+ * The live counters come from Sanity:
+ *   • Number of Events  → getAllEventsCount()
+ *   • Volunteer Number  → getSiteStats().volunteerCount
+ *   • Volunteer Hours   → getSiteStats().volunteerHours
+ *
+ * `to: 0` is the honest fallback when Sanity isn't configured or the
+ * singleton doesn't exist yet — better than showing a made-up number.
+ */
 export const HOME_STATS = [
-  { title: "Number of Events", to: 1, duration: 2 },
-  { title: "Volunteer Number", to: 2, duration: 2 },
-  { title: "Volunteer Hours", to: 10, duration: 2 },
+  { title: "Number of Events", to: 0, duration: 2 },
+  { title: "Volunteer Number", to: 0, duration: 2 },
+  { title: "Volunteer Hours", to: 0, duration: 2 },
 ] as const;
 
 export const HOME_ABOUT = {
