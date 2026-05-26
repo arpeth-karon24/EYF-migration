@@ -9,6 +9,7 @@ import {
   createParagraph,
   createButton,
   createDivider,
+  SITE_URL,
 } from './baseTemplate';
 
 /**
@@ -29,7 +30,7 @@ export function newsletterUserEmail(email: string): string {
     ${createDivider()}
 
     ${createParagraph('Want to start exploring now?')}
-    ${createButton('Visit Our Website', 'https://engage-youth.org')}
+    ${createButton('Visit Our Website', SITE_URL)}
 
     ${createParagraph(
       `You can unsubscribe anytime using the link at the bottom of any newsletter we send.<br><br>Thanks for joining us,<br><strong>The Engage Youth Foundation Team</strong>`,

@@ -10,6 +10,7 @@ import {
   createHighlight,
   createButton,
   createDivider,
+  SITE_URL,
 } from './baseTemplate';
 
 /**
@@ -27,7 +28,7 @@ export function contactInquiryUserEmail(name: string, email: string): string {
     ${createDivider()}
 
     ${createParagraph('In the meantime, feel free to explore our work or get involved:')}
-    ${createButton('Visit Our Website', 'https://engage-youth.org')}
+    ${createButton('Visit Our Website', SITE_URL)}
 
     ${createParagraph(
       `If you have anything else to add, just reply to this email — it goes straight to our team.<br><br>Warm regards,<br><strong>The Engage Youth Foundation Team</strong>`,

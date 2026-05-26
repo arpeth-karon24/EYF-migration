@@ -18,7 +18,7 @@
 // Note: this module is imported by Cloudflare Pages Functions (Workers),
 // where `process` is not defined globally. We guard the env access so the
 // same module works in both Node-style build environments and Workers.
-const SITE_URL =
+export const SITE_URL =
   (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SITE_URL) ||
   'https://engage-youth-web.pages.dev';
 const LOGO_URL = `${SITE_URL.replace(/\/$/, '')}/images/logo/eyf-logo.png`;
