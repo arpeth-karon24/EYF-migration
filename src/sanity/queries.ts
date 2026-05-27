@@ -159,17 +159,19 @@ export async function getAdvisoryBoard(): Promise<SanityTeamMember[]> {
 // ─── Site Stats (homepage counters) ───────────────────────────────────────────
 
 /**
- * Fetch the singleton "Site Stats" document used by the homepage counters.
- * Returns null if Sanity isn't configured OR the singleton hasn't been
- * created yet — the homepage falls back to HOME_STATS defaults in that case.
+ * Fetch the "Site Stats" document used by the homepage counters.
+ * Treated as a singleton by convention — if multiple ever exist we take
+ * the oldest, so a duplicate created by accident doesn't make the homepage
+ * stats flip-flop.
  *
- * Document ID is hardcoded to "siteStats" so we don't need a slug lookup.
+ * Returns null if Sanity isn't configured OR no document exists yet —
+ * the homepage falls back to HOME_STATS (which is 0/0/0) in that case.
  */
 export async function getSiteStats(): Promise<SanitySiteStats | null> {
   const client = getSanityClient();
   if (!client) return null;
   const result = await client.fetch<SanitySiteStats | null>(
-    `*[_type == "siteStats" && _id == "siteStats"][0] {
+    `*[_type == "siteStats"] | order(_createdAt asc) [0] {
       _id,
       volunteerCount,
       volunteerHours,
