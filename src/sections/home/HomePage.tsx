@@ -9,26 +9,27 @@ import {
   getAllEventsCount,
   getUpcomingEvents,
   getSiteStats,
-  getVolunteerCount,
 } from "@/sanity/queries";
 
 export async function HomePage() {
   // Fetch all stat sources in parallel.
-  //   • eventsCount      — live count of every event in Sanity
-  //   • siteStats        — singleton: volunteerCount (baseline) + volunteerHours
-  //   • volunteerRecords — count of unique volunteerRegistration docs (deduped)
-  //   • upcoming         — for the events carousel further down the page
-  // Each source is independent — if any fails we fall back to HOME_STATS.
-  const [eventsCount, siteStats, volunteerRecords, upcomingEvents] = await Promise.all([
+  //   • eventsCount — live count of every event in Sanity
+  //   • siteStats   — singleton holding volunteerCount + volunteerHours
+  //   • upcoming    — for the events carousel further down the page
+  //
+  // NOTE: the volunteer count comes from siteStats.volunteerCount, NOT from
+  // counting volunteerRegistration docs. The static homepage build queries
+  // Sanity unauthenticated, and the public API does not return
+  // volunteerRegistration documents — but it DOES return siteStats. The
+  // /api/volunteer Function increments siteStats.volunteerCount on each new
+  // (deduped) registration, so this value reflects unique volunteers.
+  const [eventsCount, siteStats, upcomingEvents] = await Promise.all([
     getAllEventsCount(),
     getSiteStats(),
-    getVolunteerCount(),
     getUpcomingEvents(),
   ]);
 
-  // Volunteer Number = manual baseline (historical/offline) + unique website
-  // registrations (deduped by email). Either source can be 0.
-  const volunteerTotal = (siteStats?.volunteerCount ?? 0) + volunteerRecords;
+  const volunteerTotal = siteStats?.volunteerCount ?? 0;
 
   const stats = [
     {

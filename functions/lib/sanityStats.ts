@@ -71,6 +71,77 @@ function sanityConfig(env: VolunteerEnv) {
 }
 
 /**
+ * Bump the homepage volunteer counter by 1 in the siteStats singleton.
+ *
+ * Why a separate counter instead of counting volunteerRegistration docs:
+ * the public (unauthenticated) Sanity API — which the static homepage build
+ * uses — does NOT return volunteerRegistration documents, but it DOES return
+ * the siteStats document. So the homepage can only read the count from
+ * siteStats. We increment it here, on each NEW (deduped) registration, so the
+ * homepage reflects unique volunteers. The volunteerRegistration records still
+ * exist for dedup + the admin CRM (read by this Function with the token).
+ *
+ * Finds the existing siteStats doc (oldest by type) and patches it; creates
+ * one only if none exists. Returns true on success. Never throws.
+ */
+export async function incrementSiteStatsVolunteerCount(env: VolunteerEnv): Promise<boolean> {
+  const cfg = sanityConfig(env);
+  if (!cfg) {
+    console.warn('[stats] Skipping volunteerCount bump — SANITY_WRITE_TOKEN or PROJECT_ID missing.');
+    return false;
+  }
+
+  try {
+    // Find the siteStats doc the homepage reads (oldest by type).
+    const findQuery = `*[_type == "siteStats"] | order(_createdAt asc) [0] { _id }`;
+    const findUrl = `${cfg.base}/query/${cfg.dataset}?query=${encodeURIComponent(findQuery)}`;
+    const findRes = await fetch(findUrl, { headers: cfg.headers });
+    if (!findRes.ok) {
+      console.error(`[stats] siteStats lookup HTTP ${findRes.status}`);
+      return false;
+    }
+    const findData = (await findRes.json()) as { result?: { _id?: string } | null };
+    const targetId = findData.result?._id ?? 'siteStats';
+
+    const body = {
+      mutations: [
+        {
+          createIfNotExists: {
+            _id: targetId,
+            _type: 'siteStats',
+            volunteerCount: 0,
+            volunteerHours: 0,
+          },
+        },
+        {
+          patch: {
+            id: targetId,
+            setIfMissing: { volunteerCount: 0 },
+            inc: { volunteerCount: 1 },
+            set: { lastUpdated: new Date().toISOString() },
+          },
+        },
+      ],
+    };
+
+    const res = await fetch(`${cfg.base}/mutate/${cfg.dataset}`, {
+      method: 'POST',
+      headers: cfg.headers,
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '<no body>');
+      console.error(`[stats] volunteerCount bump HTTP ${res.status}:`, errText);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('[stats] volunteerCount bump failed:', err);
+    return false;
+  }
+}
+
+/**
  * Check whether a volunteer with this email already exists.
  * Returns:
  *   • true  — a registration with this email exists (duplicate)

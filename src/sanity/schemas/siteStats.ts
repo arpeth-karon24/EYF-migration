@@ -32,9 +32,9 @@ export const siteStatsSchema = defineType({
   fields: [
     defineField({
       name: 'volunteerCount',
-      title: 'Volunteer Number (manual baseline)',
+      title: 'Volunteer Number',
       description:
-        'Baseline count of historical / offline volunteers NOT tracked through the website form. The homepage shows this number PLUS the count of unique online registrations (deduped by email). Leave at 0 if every volunteer comes through the website form.',
+        'Live count shown on the homepage. Auto-incremented by +1 on each new (deduped) website registration. You can also edit it manually here — e.g. to seed a historical/offline starting number or correct a mistake.',
       type: 'number',
       initialValue: 0,
       validation: (Rule) => Rule.required().min(0).integer(),

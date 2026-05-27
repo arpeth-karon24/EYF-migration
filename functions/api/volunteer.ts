@@ -17,7 +17,11 @@ import { validateTurnstileToken } from '@/lib/turnstile';
 import { sendBatchEmails } from '@/lib/resend';
 import { volunteerRegistrationUserEmail, volunteerRegistrationAdminEmail } from '@/lib/emailTemplates';
 import { ValidationError } from '@/types/api';
-import { getVolunteerByEmail, createVolunteerRecord } from '../lib/sanityStats';
+import {
+  getVolunteerByEmail,
+  createVolunteerRecord,
+  incrementSiteStatsVolunteerCount,
+} from '../lib/sanityStats';
 
 interface Env {
   ADMIN_EMAIL?: string;
@@ -166,6 +170,17 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       });
     } catch (err) {
       console.error('Failed to create Sanity volunteer record:', err);
+    }
+
+    // Bump the homepage counter. The static homepage reads volunteer numbers
+    // from siteStats (publicly visible), NOT from volunteerRegistration docs
+    // (which the unauthenticated API can't see). We only get here for NEW
+    // volunteers — duplicates returned earlier — so the count stays unique.
+    // Awaited so the Worker doesn't tear down before the write completes.
+    try {
+      await incrementSiteStatsVolunteerCount(env);
+    } catch (err) {
+      console.error('Failed to bump siteStats volunteerCount:', err);
     }
 
     const adminEmail = env.ADMIN_EMAIL || 'admin@engage-youth.org';
