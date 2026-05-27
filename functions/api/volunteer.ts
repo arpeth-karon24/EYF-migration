@@ -206,21 +206,25 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     // ── Record the volunteer in Sanity (deduped by email) ───────────────────
-    // Fire-and-forget: failures are logged but never affect the user response.
-    // The lead is already captured (admin notified, user confirmed), so a
-    // missing record is a smaller problem than a 500 to the user. The
-    // deterministic doc ID guarantees no duplicate even under concurrency.
-    createVolunteerRecord(env, {
-      name: sanitized.name,
-      email: sanitized.email,
-      contactNumber: sanitized.contactNumber,
-      city: sanitized.city,
-      eventTitle: sanitized.eventTitle,
-      availability: sanitized.availability,
-      skillsAndInterests: sanitized.skillsAndInterests,
-    }).catch((err) => {
+    // IMPORTANT: this MUST be awaited. In Cloudflare Pages Functions, the
+    // Worker is torn down the moment the Response is returned — any un-awaited
+    // (fire-and-forget) promise gets cancelled mid-flight, so the Sanity write
+    // never completes. We await it (wrapped in try/catch) so the record is
+    // actually created, while still never failing the user response if Sanity
+    // happens to be down. The deterministic doc ID prevents duplicates.
+    try {
+      await createVolunteerRecord(env, {
+        name: sanitized.name,
+        email: sanitized.email,
+        contactNumber: sanitized.contactNumber,
+        city: sanitized.city,
+        eventTitle: sanitized.eventTitle,
+        availability: sanitized.availability,
+        skillsAndInterests: sanitized.skillsAndInterests,
+      });
+    } catch (err) {
       console.error('Failed to create Sanity volunteer record:', err);
-    });
+    }
 
     return new Response(
       JSON.stringify(buildSuccessResponse('Your volunteer registration has been received. We will be in touch shortly.', {
