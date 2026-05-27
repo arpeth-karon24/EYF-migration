@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { InternalPageShell } from '@/components/layout/InternalPageShell';
@@ -39,12 +39,22 @@ function EventDeepLinkReader({
   const searchParams = useSearchParams();
   const eventIdFromUrl = searchParams.get('event');
 
+  // Guard so the deep-link only auto-opens the modal ONCE per page load.
+  // Without this, the effect re-runs on every parent re-render (e.g. after
+  // the user closes the modal) and — because ?event= is still in the URL —
+  // immediately re-opens it, making the modal impossible to close.
+  const hasAutoOpened = useRef(false);
+
   useEffect(() => {
+    if (hasAutoOpened.current) return;
     if (!eventIdFromUrl) return;
     // Only auto-open if the event ID actually matches a known upcoming event.
     // Stale or invalid IDs are silently ignored so the page still renders normally.
     const match = upcomingEvents.find((evt) => evt._id === eventIdFromUrl);
-    if (match) onMatchFound(match._id);
+    if (match) {
+      hasAutoOpened.current = true;
+      onMatchFound(match._id);
+    }
   }, [eventIdFromUrl, upcomingEvents, onMatchFound]);
 
   return null;
@@ -54,16 +64,21 @@ export default function VolunteerPageClient({ upcomingEvents }: Props) {
   const [registrationOpen, setRegistrationOpen] = useState(false);
   const [prefillEventId, setPrefillEventId] = useState<string | undefined>(undefined);
 
-  const handleEventDeepLink = (eventId: string) => {
+  // Stable identity so EventDeepLinkReader's effect deps don't churn.
+  const handleEventDeepLink = useCallback((eventId: string) => {
     setPrefillEventId(eventId);
     setRegistrationOpen(true);
-  };
+  }, []);
 
-  // Clear the prefill when the modal closes so a fresh open doesn't reuse it.
-  const handleClose = () => {
+  // Close the modal, clear the prefill, AND strip ?event= from the URL so
+  // neither a re-render nor a page refresh can re-open the modal.
+  const handleClose = useCallback(() => {
     setRegistrationOpen(false);
     setPrefillEventId(undefined);
-  };
+    if (typeof window !== 'undefined' && window.location.search.includes('event=')) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, []);
 
   return (
     <InternalPageShell>
