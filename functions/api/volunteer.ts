@@ -145,6 +145,29 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       );
     }
 
+    // ── Capture the lead FIRST — the record is the source of truth ───────────
+    // The volunteer record (not the email) is what the homepage count and the
+    // admin's CRM rely on, so it must NOT depend on whether a confirmation
+    // email delivers. We create it BEFORE sending emails, so a valid
+    // registration is captured even if email fails (e.g. Resend can't reach an
+    // external address while the sending domain is still unverified).
+    // Awaited so the Worker isn't torn down before the write completes; the
+    // deterministic doc ID prevents duplicates even under concurrency.
+    let recordSaved = false;
+    try {
+      recordSaved = await createVolunteerRecord(env, {
+        name: sanitized.name,
+        email: sanitized.email,
+        contactNumber: sanitized.contactNumber,
+        city: sanitized.city,
+        eventTitle: sanitized.eventTitle,
+        availability: sanitized.availability,
+        skillsAndInterests: sanitized.skillsAndInterests,
+      });
+    } catch (err) {
+      console.error('Failed to create Sanity volunteer record:', err);
+    }
+
     const adminEmail = env.ADMIN_EMAIL || 'admin@engage-youth.org';
     const submittedAt = new Date().toLocaleString();
 
@@ -161,6 +184,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       submittedAt
     );
 
+    // ── Emails are best-effort notifications, NOT a gate on registration ─────
+    // While the Resend sending domain is unverified, confirmation emails to
+    // external addresses fail. That must not block a valid registration — the
+    // record is already saved above. We log failures for visibility; once the
+    // domain is verified, both emails deliver normally and these become no-ops.
     const emailResults = await sendBatchEmails(
       {
         to: sanitized.email,
@@ -178,57 +206,21 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     );
 
     if (!emailResults.admin) {
-      console.error('Failed to send admin notification email', emailResults);
-      return new Response(
-        JSON.stringify(buildErrorResponse(
-          'Registration failed to register. Please try again or contact us directly.',
-          'ADMIN_EMAIL_FAILED'
-        )),
-        {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+      console.warn('Volunteer admin notification email failed (record still saved)', emailResults);
     }
-
     if (!emailResults.user) {
-      console.error('Failed to send user confirmation email', emailResults);
-      return new Response(
-        JSON.stringify(buildErrorResponse(
-          'Registration failed to register. Please try again or contact us directly.',
-          'USER_EMAIL_FAILED'
-        )),
-        {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        }
+      console.warn(
+        'Volunteer user confirmation email failed — likely Resend unverified-domain block (record still saved)',
+        emailResults,
       );
-    }
-
-    // ── Record the volunteer in Sanity (deduped by email) ───────────────────
-    // IMPORTANT: this MUST be awaited. In Cloudflare Pages Functions, the
-    // Worker is torn down the moment the Response is returned — any un-awaited
-    // (fire-and-forget) promise gets cancelled mid-flight, so the Sanity write
-    // never completes. We await it (wrapped in try/catch) so the record is
-    // actually created, while still never failing the user response if Sanity
-    // happens to be down. The deterministic doc ID prevents duplicates.
-    try {
-      await createVolunteerRecord(env, {
-        name: sanitized.name,
-        email: sanitized.email,
-        contactNumber: sanitized.contactNumber,
-        city: sanitized.city,
-        eventTitle: sanitized.eventTitle,
-        availability: sanitized.availability,
-        skillsAndInterests: sanitized.skillsAndInterests,
-      });
-    } catch (err) {
-      console.error('Failed to create Sanity volunteer record:', err);
     }
 
     return new Response(
       JSON.stringify(buildSuccessResponse('Your volunteer registration has been received. We will be in touch shortly.', {
-        submissionId: emailResults.user?.id ?? emailResults.admin.id,
+        // Guard with optional chaining — either email may be null now that
+        // email delivery is best-effort and no longer blocks registration.
+        submissionId: emailResults.user?.id ?? emailResults.admin?.id ?? null,
+        recordSaved,
       })),
       {
         status: 200,
