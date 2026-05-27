@@ -55,6 +55,15 @@ function formatEventTime(start: string, end?: string): string {
 // ─────────────────────────────────────────────────────────────────────────────
 export async function generateStaticParams() {
   const slugs = await getAllEventSlugs();
+  // `output: export` requires a dynamic route to produce at least one path,
+  // or the ENTIRE build fails. When the CMS has zero events (e.g. all were
+  // deleted), emit a single reserved placeholder slug that the page below
+  // resolves to notFound(). This keeps the build green so the homepage,
+  // API functions, and everything else still deploy — instead of one empty
+  // collection taking down the whole site.
+  if (slugs.length === 0) {
+    return [{ slug: "no-events" }];
+  }
   return slugs.map((slug) => ({ slug }));
 }
 
