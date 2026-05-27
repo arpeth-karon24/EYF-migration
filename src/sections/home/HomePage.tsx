@@ -5,19 +5,30 @@ import { HomeAboutSection } from "@/sections/home/HomeAboutSection";
 import { HomeEventsSection } from "@/sections/home/HomeEventsSection";
 import { HomeKeyActivities } from "@/sections/home/HomeKeyActivities";
 import { NewsletterSection } from "@/components/footer/NewsletterSection";
-import { getAllEventsCount, getUpcomingEvents, getSiteStats } from "@/sanity/queries";
+import {
+  getAllEventsCount,
+  getUpcomingEvents,
+  getSiteStats,
+  getVolunteerCount,
+} from "@/sanity/queries";
 
 export async function HomePage() {
-  // Fetch all three stat sources in parallel.
-  //   • eventsCount — live count of every event in Sanity
-  //   • siteStats   — singleton with volunteerCount + volunteerHours
-  //   • upcoming    — for the events carousel further down the page
+  // Fetch all stat sources in parallel.
+  //   • eventsCount      — live count of every event in Sanity
+  //   • siteStats        — singleton: volunteerCount (baseline) + volunteerHours
+  //   • volunteerRecords — count of unique volunteerRegistration docs (deduped)
+  //   • upcoming         — for the events carousel further down the page
   // Each source is independent — if any fails we fall back to HOME_STATS.
-  const [eventsCount, siteStats, upcomingEvents] = await Promise.all([
+  const [eventsCount, siteStats, volunteerRecords, upcomingEvents] = await Promise.all([
     getAllEventsCount(),
     getSiteStats(),
+    getVolunteerCount(),
     getUpcomingEvents(),
   ]);
+
+  // Volunteer Number = manual baseline (historical/offline) + unique website
+  // registrations (deduped by email). Either source can be 0.
+  const volunteerTotal = (siteStats?.volunteerCount ?? 0) + volunteerRecords;
 
   const stats = [
     {
@@ -27,7 +38,7 @@ export async function HomePage() {
     },
     {
       title: HOME_STATS[1].title,
-      to: siteStats?.volunteerCount ?? HOME_STATS[1].to,
+      to: volunteerTotal,
       duration: 2,
     },
     {

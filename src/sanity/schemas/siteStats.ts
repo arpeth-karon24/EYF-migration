@@ -32,9 +32,9 @@ export const siteStatsSchema = defineType({
   fields: [
     defineField({
       name: 'volunteerCount',
-      title: 'Volunteer Number',
+      title: 'Volunteer Number (manual baseline)',
       description:
-        'Total volunteers registered with EYF. Auto-incremented on each successful /api/volunteer submission. You can also override manually here if needed (e.g., to seed initial count or correct a mistake).',
+        'Baseline count of historical / offline volunteers NOT tracked through the website form. The homepage shows this number PLUS the count of unique online registrations (deduped by email). Leave at 0 if every volunteer comes through the website form.',
       type: 'number',
       initialValue: 0,
       validation: (Rule) => Rule.required().min(0).integer(),

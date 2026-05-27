@@ -1,120 +1,164 @@
 /**
- * Sanity write helper for the homepage stats singleton.
+ * Sanity write helpers for volunteer registrations.
  *
- * Used by Cloudflare Pages Functions to bump live counters (e.g.,
- * volunteer count) when a form submission succeeds. We talk directly to
- * Sanity's HTTP mutation API rather than importing @sanity/client so this
- * stays compatible with the Workers runtime without bundling extra deps.
+ * We talk directly to Sanity's HTTP API (query + mutate) rather than
+ * importing @sanity/client, so this stays compatible with the Cloudflare
+ * Workers runtime without bundling extra deps.
+ *
+ * Deduplication model:
+ *   • Each unique volunteer becomes ONE document whose _id is derived
+ *     deterministically from the normalized email
+ *     (e.g. "volunteer.john_example_com").
+ *   • createIfNotExists with that ID means a repeat submission from the
+ *     same email is a no-op — no duplicate doc, no double-count.
+ *   • The homepage volunteer count = manual baseline + count of these docs.
  *
  * Authentication:
- *   • Reads SANITY_WRITE_TOKEN (server-only env var, set in Cloudflare
- *     Pages → Settings → Environment Variables).
- *   • Reads NEXT_PUBLIC_SANITY_PROJECT_ID and NEXT_PUBLIC_SANITY_DATASET
- *     for the API URL.
+ *   • SANITY_WRITE_TOKEN — server-only, set in Cloudflare Pages env vars
+ *     (use an ENCRYPTED secret so it survives `wrangler pages deploy`).
+ *   • NEXT_PUBLIC_SANITY_PROJECT_ID / NEXT_PUBLIC_SANITY_DATASET for the URL.
  *
- * Behavior:
- *   • Fire-and-forget — caller awaits the promise but failures are
- *     swallowed (logged to console.error). Never blocks the user response.
- *   • If any env var is missing, the function is a no-op — useful for
- *     local dev where you don't want stat writes against production.
- *   • Uses .setIfMissing + .inc so the very first volunteer increments
- *     a missing/0 field to 1 instead of crashing.
+ * All functions degrade gracefully: if env is missing or Sanity errors,
+ * they log and return a safe value so the volunteer form never breaks.
  */
 
 const SANITY_API_VERSION = '2024-01-01';
-const FALLBACK_DOC_ID = 'siteStats'; // Used only when no doc exists yet.
 
-interface StatsEnv {
+interface VolunteerEnv {
   SANITY_WRITE_TOKEN?: string;
   NEXT_PUBLIC_SANITY_PROJECT_ID?: string;
   NEXT_PUBLIC_SANITY_DATASET?: string;
 }
 
+export interface VolunteerRecordInput {
+  name: string;
+  email: string;
+  contactNumber?: string;
+  city?: string;
+  eventTitle?: string;
+  availability?: string;
+  skillsAndInterests?: string;
+}
+
+/** Normalize an email for dedup: lowercase + trim. */
+export function normalizeEmail(email: string): string {
+  return email.toLowerCase().trim();
+}
+
 /**
- * Bump the volunteer count by 1 in the Sanity siteStats document.
- * Resolves true on success, false otherwise (never throws).
- *
- * Strategy:
- *   1. Query Sanity for an existing siteStats document (by type, not ID).
- *      This is intentionally flexible — admins can create the document in
- *      Studio without worrying about specifying a custom ID.
- *   2. If one exists → patch that exact document.
- *   3. If none exists → create one with a stable fallback ID. The next
- *      signup will find it via the query above.
+ * Deterministic Sanity document ID for a volunteer, derived from the email.
+ * Same email → same ID → dedup-safe. Sanity IDs allow [a-zA-Z0-9._-] only.
  */
-export async function incrementVolunteerCount(env: StatsEnv): Promise<boolean> {
+function volunteerDocId(normalizedEmail: string): string {
+  const safe = normalizedEmail.replace(/[^a-z0-9]/g, '_');
+  return `volunteer.${safe}`;
+}
+
+function sanityConfig(env: VolunteerEnv) {
   const token = env.SANITY_WRITE_TOKEN;
   const projectId = env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   const dataset = env.NEXT_PUBLIC_SANITY_DATASET ?? 'production';
+  if (!token || !projectId) return null;
+  return {
+    token,
+    base: `https://${projectId}.api.sanity.io/v${SANITY_API_VERSION}/data`,
+    dataset,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  };
+}
 
-  if (!token || !projectId) {
-    console.warn('[sanityStats] Skipping increment — SANITY_WRITE_TOKEN or PROJECT_ID missing.');
+/**
+ * Check whether a volunteer with this email already exists.
+ * Returns:
+ *   • true  — a registration with this email exists (duplicate)
+ *   • false — no existing registration (new volunteer)
+ *   • null  — could not determine (Sanity not configured / errored) →
+ *             caller should treat as "proceed" so real users aren't blocked.
+ */
+export async function getVolunteerByEmail(
+  env: VolunteerEnv,
+  rawEmail: string,
+): Promise<boolean | null> {
+  const cfg = sanityConfig(env);
+  if (!cfg) {
+    console.warn('[volunteers] Skipping dedup check — SANITY_WRITE_TOKEN or PROJECT_ID missing.');
+    return null;
+  }
+
+  const docId = volunteerDocId(normalizeEmail(rawEmail));
+  const query = `defined(*[_id == "${docId}"][0]._id)`;
+  const url = `${cfg.base}/query/${cfg.dataset}?query=${encodeURIComponent(query)}`;
+
+  try {
+    const res = await fetch(url, { headers: cfg.headers });
+    if (!res.ok) {
+      console.error(`[volunteers] dedup query HTTP ${res.status}`);
+      return null;
+    }
+    const data = (await res.json()) as { result?: boolean };
+    return data.result === true;
+  } catch (err) {
+    console.error('[volunteers] dedup query failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Create a volunteer registration document (idempotent via deterministic ID).
+ * Returns true on success, false otherwise. Never throws.
+ *
+ * Uses createIfNotExists, so even under a race (two simultaneous submissions
+ * with the same email) only one document is ever created.
+ */
+export async function createVolunteerRecord(
+  env: VolunteerEnv,
+  input: VolunteerRecordInput,
+): Promise<boolean> {
+  const cfg = sanityConfig(env);
+  if (!cfg) {
+    console.warn('[volunteers] Skipping record creation — SANITY_WRITE_TOKEN or PROJECT_ID missing.');
     return false;
   }
 
-  const apiBase = `https://${projectId}.api.sanity.io/v${SANITY_API_VERSION}/data`;
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
+  const normalized = normalizeEmail(input.email);
+  const docId = volunteerDocId(normalized);
+
+  const body = {
+    mutations: [
+      {
+        createIfNotExists: {
+          _id: docId,
+          _type: 'volunteerRegistration',
+          name: input.name,
+          email: input.email,
+          ...(input.contactNumber ? { contactNumber: input.contactNumber } : {}),
+          ...(input.city ? { city: input.city } : {}),
+          ...(input.eventTitle ? { eventTitle: input.eventTitle } : {}),
+          ...(input.availability ? { availability: input.availability } : {}),
+          ...(input.skillsAndInterests ? { skillsAndInterests: input.skillsAndInterests } : {}),
+          registeredAt: new Date().toISOString(),
+        },
+      },
+    ],
   };
 
   try {
-    // ── Step 1: find the existing siteStats document (oldest if multiple). ──
-    const findQuery = `*[_type == "siteStats"] | order(_createdAt asc) [0] { _id }`;
-    const findUrl = `${apiBase}/query/${dataset}?query=${encodeURIComponent(findQuery)}`;
-    const findRes = await fetch(findUrl, { headers });
-
-    if (!findRes.ok) {
-      const errText = await findRes.text().catch(() => '<no body>');
-      console.error(`[sanityStats] Failed to query existing siteStats: HTTP ${findRes.status}`, errText);
-      return false;
-    }
-
-    const findData = (await findRes.json()) as { result?: { _id?: string } | null };
-    const existingId = findData.result?._id;
-
-    // ── Step 2: build the mutation. ─────────────────────────────────────────
-    const targetId = existingId ?? FALLBACK_DOC_ID;
-    const body = {
-      mutations: [
-        // Ensure the doc exists. If `existingId` is set, this is a no-op.
-        // Otherwise we seed it with sane defaults so .inc() works on the
-        // very first signup.
-        {
-          createIfNotExists: {
-            _id: targetId,
-            _type: 'siteStats',
-            volunteerCount: 0,
-            volunteerHours: 0,
-          },
-        },
-        {
-          patch: {
-            id: targetId,
-            setIfMissing: { volunteerCount: 0 },
-            inc: { volunteerCount: 1 },
-            set: { lastUpdated: new Date().toISOString() },
-          },
-        },
-      ],
-    };
-
-    const mutateUrl = `${apiBase}/mutate/${dataset}`;
-    const res = await fetch(mutateUrl, {
+    const res = await fetch(`${cfg.base}/mutate/${cfg.dataset}`, {
       method: 'POST',
-      headers,
+      headers: cfg.headers,
       body: JSON.stringify(body),
     });
-
     if (!res.ok) {
       const errText = await res.text().catch(() => '<no body>');
-      console.error(`[sanityStats] HTTP ${res.status} from Sanity mutate:`, errText);
+      console.error(`[volunteers] create HTTP ${res.status}:`, errText);
       return false;
     }
-
     return true;
   } catch (err) {
-    console.error('[sanityStats] Failed to increment volunteer count:', err);
+    console.error('[volunteers] create failed:', err);
     return false;
   }
 }

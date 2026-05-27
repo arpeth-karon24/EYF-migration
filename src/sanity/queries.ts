@@ -180,3 +180,17 @@ export async function getSiteStats(): Promise<SanitySiteStats | null> {
   );
   return result ?? null;
 }
+
+/**
+ * Count of unique volunteer registrations (one doc per unique email).
+ * This is the auto-tracked, deduplicated portion of the homepage
+ * "Volunteer Number" — added to the manual baseline in siteStats.
+ */
+export async function getVolunteerCount(): Promise<number> {
+  const client = getSanityClient();
+  if (!client) return 0;
+  const count = await client.fetch<number>(
+    `count(*[_type == "volunteerRegistration"])`
+  );
+  return count ?? 0;
+}

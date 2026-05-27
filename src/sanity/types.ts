@@ -48,7 +48,21 @@ export interface SanityTeamMember {
 /** Singleton document for live homepage counters. */
 export interface SanitySiteStats {
   _id: string;
+  /** Manual baseline — historical/offline volunteers not tracked via the site. */
   volunteerCount: number;
   volunteerHours: number;
   lastUpdated?: string;
+}
+
+/** One document per unique volunteer (deduped by email at write time). */
+export interface SanityVolunteerRegistration {
+  _id: string;
+  name: string;
+  email: string;
+  contactNumber?: string;
+  city?: string;
+  eventTitle?: string;
+  availability?: string;
+  skillsAndInterests?: string;
+  registeredAt?: string;
 }

@@ -17,7 +17,7 @@ import { validateTurnstileToken } from '@/lib/turnstile';
 import { sendBatchEmails } from '@/lib/resend';
 import { volunteerRegistrationUserEmail, volunteerRegistrationAdminEmail } from '@/lib/emailTemplates';
 import { ValidationError } from '@/types/api';
-import { incrementVolunteerCount } from '../lib/sanityStats';
+import { getVolunteerByEmail, createVolunteerRecord } from '../lib/sanityStats';
 
 interface Env {
   ADMIN_EMAIL?: string;
@@ -126,6 +126,25 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       emergencyContact: body.emergencyContact || '',
     });
 
+    // ── Deduplication ───────────────────────────────────────────────────────
+    // Block repeat registrations from the same email so the volunteer count
+    // reflects unique people, not raw submissions. If the dedup check can't
+    // run (Sanity not configured), we proceed — better to allow a possible
+    // duplicate than to block a legitimate new volunteer.
+    const alreadyRegistered = await getVolunteerByEmail(env, sanitized.email);
+    if (alreadyRegistered === true) {
+      return new Response(
+        JSON.stringify(buildSuccessResponse(
+          "You're already registered as a volunteer with this email. Thank you for your continued interest — we'll be in touch about upcoming opportunities.",
+          { alreadyRegistered: true }
+        )),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
     const adminEmail = env.ADMIN_EMAIL || 'admin@engage-youth.org';
     const submittedAt = new Date().toLocaleString();
 
@@ -186,12 +205,21 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       );
     }
 
-    // ── Bump the homepage volunteerCount in Sanity ──────────────────────────
-    // Fire-and-forget: failures here are logged but never affect the user
-    // response. The lead is already captured (admin notified, user confirmed),
-    // so an out-of-sync stat is a much smaller problem than a 500 to the user.
-    incrementVolunteerCount(env).catch((err) => {
-      console.error('Failed to increment Sanity volunteerCount:', err);
+    // ── Record the volunteer in Sanity (deduped by email) ───────────────────
+    // Fire-and-forget: failures are logged but never affect the user response.
+    // The lead is already captured (admin notified, user confirmed), so a
+    // missing record is a smaller problem than a 500 to the user. The
+    // deterministic doc ID guarantees no duplicate even under concurrency.
+    createVolunteerRecord(env, {
+      name: sanitized.name,
+      email: sanitized.email,
+      contactNumber: sanitized.contactNumber,
+      city: sanitized.city,
+      eventTitle: sanitized.eventTitle,
+      availability: sanitized.availability,
+      skillsAndInterests: sanitized.skillsAndInterests,
+    }).catch((err) => {
+      console.error('Failed to create Sanity volunteer record:', err);
     });
 
     return new Response(
