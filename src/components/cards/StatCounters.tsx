@@ -47,7 +47,10 @@ export function StatCounters({ stats }: { stats: readonly Stat[] }) {
 
   return (
     <div className="mx-auto max-w-[1440px] px-4">
-      <div ref={rootRef} className="grid gap-16 py-10 sm:grid-cols-3 lg:py-14">
+      {/* Tightened vertical rhythm: pt is small (sits flush below the hero
+          image with no visible gap) while pb keeps normal breathing room
+          before the next section. Tailwind's standard spacing scale only. */}
+      <div ref={rootRef} className="grid gap-12 pt-6 pb-10 sm:grid-cols-3 sm:gap-16 lg:pt-8 lg:pb-14">
         {stats.map((s) => (
           <div key={s.title} className="flex flex-col items-center justify-center text-center">
             <div

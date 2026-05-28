@@ -45,14 +45,22 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Swiper hero — full-bleed banner.
  *
- * CRITICAL: use `height` (fixed) instead of `min-height` here so EVERY
- * slide has the same height regardless of its body-copy length. If any
- * one slide's text overflows min-height, Swiper's wrapper grows to match
- * the tallest slide and the shorter slides leave a visible dark gap
- * before the next section. Fixed height + overflow-hidden = uniform.
+ * Layout contract:
+ *   1. ALL slides share one fixed height — so longer body copy on one
+ *      slide can't push the wrapper taller and leave a visible gap
+ *      below the shorter slides.
+ *   2. `min(80vh, 700px)` keeps the hero compact enough that the home
+ *      stats section is visible above the fold on a 1366×768 laptop
+ *      (was 820px, which pushed stats below the fold there).
+ *   3. Explicit overflow / margin / padding zeroing so library upgrades
+ *      can't introduce stray spacing.
+ *   4. Pagination is force-positioned absolute at the slide bottom so it
+ *      can never occupy layout space below the hero (root cause of the
+ *      gap when Swiper failed to apply its `.swiper-horizontal` class
+ *      to the container).
  */
 .home-hero .swiper {
-  --eyf-hero-h: min(85vh, 820px);
+  --eyf-hero-h: min(80vh, 700px);
 }
 
 .home-hero .swiper,
@@ -62,8 +70,30 @@ h1, h2, h3, h4, h5, h6 {
   max-height: var(--eyf-hero-h) !important;
 }
 
+.home-hero .swiper {
+  display: block !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 .home-hero .swiper-slide {
   overflow: hidden;
+}
+
+/* Anchor the pagination dots inside the hero — never let them flow into
+ * the gap area below. Works regardless of which classes Swiper applies. */
+.home-hero .swiper-pagination {
+  position: absolute !important;
+  bottom: 20px !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  text-align: center !important;
+  z-index: 10 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .home-hero .napae-overlay::before {

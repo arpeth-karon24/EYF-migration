@@ -20,7 +20,7 @@ import { HERO_SLIDES } from "@/constants/homeContent";
  */
 export function HomeHero() {
   return (
-    <section className="home-hero relative w-full overflow-hidden bg-black" aria-label="Homepage banner">
+    <section className="home-hero relative w-full overflow-hidden bg-eyf-page" aria-label="Homepage banner">
       <Swiper
         modules={[Autoplay, Pagination, Navigation, Keyboard]}
         loop
