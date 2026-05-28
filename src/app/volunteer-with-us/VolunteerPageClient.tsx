@@ -3,6 +3,8 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { InternalPageShell } from '@/components/layout/InternalPageShell';
 import { HeroSection, ContentSection, GuidelinesList } from '@/components/sections';
 import VolunteerRegistrationModal from '@/components/sections/VolunteerRegistrationModal';
@@ -13,6 +15,8 @@ import {
   VOLUNTEER_SPOTLIGHTS,
 } from '@/constants/volunteerContent';
 import type { SanityEvent } from '@/sanity/types';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface Props {
   /**
@@ -63,6 +67,65 @@ function EventDeepLinkReader({
 export default function VolunteerPageClient({ upcomingEvents }: Props) {
   const [registrationOpen, setRegistrationOpen] = useState(false);
   const [prefillEventId, setPrefillEventId] = useState<string | undefined>(undefined);
+  const spotlightsRef = useRef<HTMLElement>(null);
+
+  // Spotlight animations — distinct from the home Key Activities feel.
+  // Whole row fades + slides up from below (vertical motion, not lateral),
+  // the 01/02/03 number pops in with a back-ease overshoot, the gold accent
+  // line "draws" from left to right. Subtle, professional, on-scroll-once.
+  useEffect(() => {
+    if (!spotlightsRef.current) return;
+    const ctx = gsap.context(() => {
+      // Section header — fade + rise
+      gsap.from('.spot-header', {
+        y: 24,
+        opacity: 0,
+        duration: 0.9,
+        ease: 'power2.out',
+        scrollTrigger: { trigger: '.spot-header', start: 'top 88%', once: true },
+      });
+
+      gsap.utils.toArray<HTMLElement>('.spot-row').forEach((row) => {
+        const trigger = { trigger: row, start: 'top 80%', once: true } as const;
+
+        // Row fades + slides up from below
+        gsap.from(row, {
+          y: 60,
+          opacity: 0,
+          duration: 1.1,
+          ease: 'power3.out',
+          scrollTrigger: trigger,
+        });
+
+        // Number badge — scales in with a soft overshoot
+        const num = row.querySelector('.spot-num');
+        if (num) {
+          gsap.from(num, {
+            scale: 0,
+            opacity: 0,
+            duration: 0.7,
+            delay: 0.35,
+            ease: 'back.out(1.8)',
+            scrollTrigger: trigger,
+          });
+        }
+
+        // Accent line — draws from left
+        const line = row.querySelector('.spot-line');
+        if (line) {
+          gsap.from(line, {
+            scaleX: 0,
+            transformOrigin: 'left center',
+            duration: 0.8,
+            delay: 0.55,
+            ease: 'power2.out',
+            scrollTrigger: trigger,
+          });
+        }
+      });
+    }, spotlightsRef);
+    return () => ctx.revert();
+  }, []);
 
   // Stable identity so EventDeepLinkReader's effect deps don't churn.
   const handleEventDeepLink = useCallback((eventId: string) => {
@@ -146,10 +209,10 @@ export default function VolunteerPageClient({ upcomingEvents }: Props) {
         </div>
       </section>
 
-      <section className="border-t border-white/5 bg-black/20 py-16 md:py-24">
+      <section ref={spotlightsRef} className="border-t border-white/5 bg-black/20 py-16 md:py-24">
         <div className="mx-auto max-w-container px-4">
           {/* Section header */}
-          <div className="mx-auto mb-16 max-w-3xl text-center md:mb-24">
+          <div className="spot-header mx-auto mb-16 max-w-3xl text-center md:mb-24">
             <p className="mb-3 font-poppins text-xs font-bold uppercase tracking-[0.25em] text-eyf-gold">
               Our work, your impact
             </p>
@@ -162,37 +225,42 @@ export default function VolunteerPageClient({ upcomingEvents }: Props) {
             </p>
           </div>
 
-          {/* Alternating feature rows — image left/right with copy on the other side */}
+          {/* Alternating feature rows — image left/right with copy on the other side.
+              Each row reveals on scroll: fade + slide up, number scales in, accent line
+              draws from left. Image gets a diagonal gold "shine" sweep on hover. */}
           <div className="mx-auto max-w-6xl space-y-16 md:space-y-24">
             {VOLUNTEER_SPOTLIGHTS.map((item, idx) => {
               const reverse = idx % 2 === 1;
               return (
                 <article
                   key={item.title}
-                  className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-14"
+                  className="spot-row grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-14"
                 >
                   {/* Image — flips to the right on alternating rows for desktop */}
                   <div className={`relative lg:col-span-7 ${reverse ? 'lg:order-2' : ''}`}>
-                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10">
+                    <div className="group relative aspect-[16/10] w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10">
                       <Image
                         src={item.image}
                         alt={item.imageAlt}
                         fill
-                        className="object-cover object-center transition-transform duration-700 hover:scale-[1.03]"
+                        className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                         sizes="(max-width: 1024px) 100vw, 700px"
                       />
-                      {/* Subtle gradient overlay for depth */}
+                      {/* Subtle base gradient — depth */}
                       <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-transparent" />
+                      {/* Diagonal gold "shine" — sweeps across on hover. Sits off-screen
+                          to the left by default and slides past the image on :hover. */}
+                      <div className="pointer-events-none absolute inset-0 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-eyf-gold/25 to-transparent transition-transform duration-[1100ms] ease-out group-hover:translate-x-full" />
                     </div>
                   </div>
 
                   {/* Copy column */}
                   <div className={`lg:col-span-5 ${reverse ? 'lg:order-1' : ''}`}>
                     <div className="mb-5 inline-flex items-center gap-3">
-                      <span className="font-poppins text-xs font-bold uppercase tracking-[0.25em] text-eyf-gold">
+                      <span className="spot-num inline-block font-poppins text-xs font-bold uppercase tracking-[0.25em] text-eyf-gold">
                         {String(idx + 1).padStart(2, '0')}
                       </span>
-                      <span className="h-px w-10 bg-eyf-gold/60" />
+                      <span className="spot-line block h-px w-10 bg-eyf-gold/60" />
                     </div>
                     <h3 className="mb-4 font-montserrat text-2xl font-bold leading-tight text-white md:text-3xl">
                       {item.title}
