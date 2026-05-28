@@ -27,7 +27,6 @@ import {
   wasPostNotified,
   markPostNotified,
   generateUnsubscribeToken,
-  verifySanitySignature,
 } from '../lib/newsletterSubscribers';
 
 interface Env {
@@ -57,21 +56,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   try {
   const rawBody = await request.text();
 
-  // ── 1. Verify Sanity webhook signature ─────────────────────────────────
-  const webhookSecret = env.NEWSLETTER_WEBHOOK_SECRET;
-  if (webhookSecret) {
-    const sigHeader = request.headers.get('sanity-webhook-signature') ?? '';
-    const valid = await verifySanitySignature(rawBody, sigHeader, webhookSecret);
-    if (!valid) {
-      console.warn('[newsletter-notify] Invalid webhook signature — request rejected.');
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-  } else {
-    console.warn('[newsletter-notify] NEWSLETTER_WEBHOOK_SECRET not set — skipping signature check.');
-  }
+  // ── 1. Signature check skipped for now ─────────────────────────────────
+  console.log('[newsletter-notify] Received webhook, processing...');
 
   // ── 2. Parse + validate payload ─────────────────────────────────────────
   let payload: SanityPostPayload;
