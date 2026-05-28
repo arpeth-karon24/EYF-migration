@@ -47,7 +47,7 @@ export function StatCounters({ stats }: { stats: readonly Stat[] }) {
 
   return (
     <div className="mx-auto max-w-[1440px] px-4">
-      <div ref={rootRef} className="grid gap-16 py-16 sm:grid-cols-3 lg:py-24">
+      <div ref={rootRef} className="grid gap-16 py-10 sm:grid-cols-3 lg:py-14">
         {stats.map((s) => (
           <div key={s.title} className="flex flex-col items-center justify-center text-center">
             <div

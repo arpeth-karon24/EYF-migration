@@ -7,9 +7,13 @@
 @tailwind utilities;
 
 :root {
-  --font-poppins: 'Poppins', sans-serif;
-  --font-montserrat: 'Montserrat', sans-serif;
-  --font-open-sans: 'Open Sans', sans-serif;
+  /* Fallbacks only — Next.js Font (layout.tsx) sets these variables to the
+     actual hashed font-family at runtime. These fallback values keep things
+     sane during FOUT or if the className fails to apply. The font names
+     here MUST match what's loaded in layout.tsx. */
+  --font-poppins: 'Space Grotesk', sans-serif;     /* display */
+  --font-montserrat: 'Inter', sans-serif;          /* accent / subtitles */
+  --font-open-sans: 'Inter', sans-serif;           /* body */
   --swiper-navigation-size: 44px;
   --swiper-theme-color: #007aff;
 }

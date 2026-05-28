@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Open_Sans, Montserrat, Poppins } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/navbar/SiteHeader";
 import { SiteFooter } from "@/components/footer/SiteFooter";
@@ -10,24 +10,36 @@ import {
   buildWebSiteSchema,
 } from "@/lib/schema/builders";
 
-const poppins = Poppins({
+// ── Typography refresh ────────────────────────────────────────────────────
+// Modern professional pair:
+//   • Space Grotesk — geometric display, slightly playful, very current
+//     (used by Vercel, Linear, GitHub Next, etc.). Drives headings + hero.
+//   • Inter        — the de-facto modern body font; exceptional readability
+//     and a wide weight range. Drives subtitles, UI, and body copy.
+//
+// CSS variable names (--font-poppins, --font-montserrat, --font-open-sans)
+// are preserved so existing `font-poppins / font-montserrat / font-opensans`
+// utility classes across the codebase keep working without a global rename.
+// The CLASS names are legacy; the VALUES they point at are the new fonts.
+
+const displayFont = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "700", "900"],
-  variable: "--font-poppins",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins", // legacy variable, now backed by Space Grotesk
   display: "swap",
 });
 
-const montserrat = Montserrat({
+const accentFont = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-montserrat", // legacy variable, now backed by Inter
+  display: "swap",
+});
+
+const bodyFont = Inter({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-montserrat",
-  display: "swap",
-});
-
-const openSans = Open_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "600", "700"],
-  variable: "--font-open-sans",
+  variable: "--font-open-sans", // legacy variable, now backed by Inter
   display: "swap",
 });
 
@@ -87,7 +99,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en-US" className={`${poppins.variable} ${montserrat.variable} ${openSans.variable}`} suppressHydrationWarning>
+    <html lang="en-US" className={`${displayFont.variable} ${accentFont.variable} ${bodyFont.variable}`} suppressHydrationWarning>
       <head>
         {/* Sitewide Schema.org — Organization + WebSite. Other schemas
             (Event, FAQPage, BlogPosting, etc.) are injected per-page. */}

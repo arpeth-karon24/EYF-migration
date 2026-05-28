@@ -63,7 +63,10 @@ export async function HomePage() {
   return (
     <div className="bg-eyf-page">
       <HomeHero />
-      <div className="bg-eyf-page py-4">
+      {/* Stats sit flush below the hero — no extra wrapper padding, so the
+          hero image flows directly into the counters. StatCounters keeps its
+          own internal py for the counters' breathing room. */}
+      <div className="bg-eyf-page">
         <div className="mx-auto max-w-container px-4">
           <StatCounters stats={stats} />
         </div>
