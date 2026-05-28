@@ -8,7 +8,6 @@ import { cn } from "@/lib/cn";
 import { PRIMARY_NAV, VOLUNTEER_CTA } from "@/constants/navigation";
 import { SITE } from "@/constants/homeContent";
 import { SearchTrigger } from "@/components/search/SearchTrigger";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -83,21 +82,6 @@ export function SiteHeader() {
               <li className="ml-3">
                 <SearchTrigger />
               </li>
-              {/* Theme toggle */}
-              <li className="ml-1">
-                <ThemeToggle />
-              </li>
-              <li className="ml-2">
-                <Link
-                  href="/donation"
-                  className={cn(
-                    "menu_custom_btn inline-flex items-center whitespace-nowrap rounded-[10px] border-0 bg-eyf-gold px-4 py-[7px]",
-                    "text-[13px] font-bold uppercase tracking-wide text-black transition-colors hover:bg-amber-400",
-                  )}
-                >
-                  Donate
-                </Link>
-              </li>
               <li className="ml-2">
                 <Link
                   href={VOLUNTEER_CTA.href}
@@ -166,19 +150,7 @@ export function SiteHeader() {
                 ))}
               </div>
             ))}
-            {/* Theme toggle row */}
-            <div className="mt-4 flex items-center gap-3 border-b pb-4" style={{ borderColor: 'var(--theme-border)' }}>
-              <span className="text-xs font-semibold uppercase tracking-widest text-[var(--theme-text-2)]">Theme</span>
-              <ThemeToggle />
-            </div>
-            <div className="pt-6 flex flex-col gap-3">
-              <Link
-                href="/donation"
-                className="block rounded-[10px] bg-eyf-gold py-4 text-center text-xs font-bold uppercase tracking-[0.15em] text-black hover:bg-amber-400"
-                onClick={() => setOpen(false)}
-              >
-                Donate
-              </Link>
+            <div className="pt-6">
               <Link
                 href={VOLUNTEER_CTA.href}
                 className="block rounded-[10px] bg-[#444444] py-4 text-center text-xs font-bold uppercase tracking-[0.15em] text-white hover:bg-[#1c1c1c]"
