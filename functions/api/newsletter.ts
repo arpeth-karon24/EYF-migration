@@ -94,7 +94,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const emailResults = await sendBatchEmails(
       {
         to: email,
-        subject: 'Welcome to Our Newsletter - Engage Youth Fund',
+        subject: 'Welcome to Our Newsletter - Engage Youth Foundation',
         html: userEmailHtml,
         replyTo: adminEmail,
       },
@@ -106,37 +106,18 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       env.RESEND_API_KEY
     );
 
+    // Log failures but never block the subscription — the record is already
+    // saved in Sanity. Email delivery issues are operational, not user errors.
     if (!emailResults.admin) {
-      console.error('Failed to send admin notification email', emailResults);
-      return new Response(
-        JSON.stringify(buildErrorResponse(
-          'Subscription failed to register. Please try again or email us directly.',
-          'ADMIN_EMAIL_FAILED'
-        )),
-        {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+      console.warn('[newsletter] Admin notification email failed — subscriber still saved.');
     }
-
     if (!emailResults.user) {
-      console.error('Failed to send user confirmation email', emailResults);
-      return new Response(
-        JSON.stringify(buildErrorResponse(
-          'Subscription failed to register. Please try again or email us directly.',
-          'USER_EMAIL_FAILED'
-        )),
-        {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+      console.warn('[newsletter] User confirmation email failed (Resend sandbox restriction?) — subscriber still saved.');
     }
 
     return new Response(
       JSON.stringify(buildSuccessResponse('Thank you for subscribing to our newsletter!', {
-        submissionId: emailResults.user?.id ?? emailResults.admin.id,
+        submissionId: emailResults.user?.id ?? emailResults.admin?.id,
       })),
       {
         status: 200,
