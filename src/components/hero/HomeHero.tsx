@@ -20,7 +20,7 @@ import { HERO_SLIDES } from "@/constants/homeContent";
  */
 export function HomeHero() {
   return (
-    <section className="home-hero relative w-full overflow-hidden bg-eyf-page" aria-label="Homepage banner">
+    <section className="home-hero relative w-full overflow-hidden" style={{ backgroundColor: 'var(--theme-bg-page)' }} aria-label="Homepage banner">
       <Swiper
         modules={[Autoplay, Pagination, Navigation, Keyboard]}
         loop
@@ -53,10 +53,14 @@ export function HomeHero() {
               />
               <div className="absolute inset-0 bg-black/60 z-[1]" />
               {/* Bottom fade — gradients the slide image into the page background
-                  (#1c1c1c) so EVERY slide transitions into the stats section
-                  seamlessly, regardless of how dark/bright that particular photo
-                  is at the bottom. Eliminates the "chunky boundary" perception. */}
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-40 bg-gradient-to-t from-[#1c1c1c] via-[#1c1c1c]/70 to-transparent" />
+                  so EVERY slide transitions into the stats section seamlessly.
+                  Uses the theme token so it matches in both dark and light mode. */}
+              <div
+                className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-40"
+                style={{
+                  background: `linear-gradient(to top, var(--theme-bg-page) 0%, transparent 100%)`,
+                }}
+              />
               <div className="relative z-[2] w-full">
                 <div className="mx-auto max-w-container px-4 py-20 lg:py-32">
                   <div className="max-w-4xl animate-fadeInDown">

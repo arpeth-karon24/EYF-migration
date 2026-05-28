@@ -55,7 +55,7 @@ function YoutubeIcon() {
 
 export function SiteFooter() {
   return (
-    <footer id="colophon" className="relative z-10 bg-[#111] text-white" role="contentinfo">
+    <footer id="colophon" className="relative z-10 text-[var(--theme-text)] transition-colors duration-300" style={{ backgroundColor: 'var(--theme-footer)' }} role="contentinfo">
       {/* Main footer grid */}
       <div className="mx-auto max-w-container px-4 pt-14 pb-10">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
@@ -141,7 +141,7 @@ export function SiteFooter() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/10">
+      <div className="border-t" style={{ borderColor: 'var(--theme-border)' }}>
         <div className="mx-auto max-w-container px-4 py-5">
           <div className="flex flex-col items-center justify-between gap-3 text-[12px] text-white/40 sm:flex-row">
             <span>© {new Date().getFullYear()} Engage Youth Foundation. All rights reserved.</span>

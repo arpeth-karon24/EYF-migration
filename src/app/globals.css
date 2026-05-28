@@ -16,6 +16,38 @@
   --font-open-sans: 'Inter', sans-serif;               /* body */
   --swiper-navigation-size: 44px;
   --swiper-theme-color: #007aff;
+
+  /* ── Theme colour tokens (dark = brand default) ── */
+  --theme-bg-page:       #1c1c1c;
+  --theme-bg-surface:    #111111;
+  --theme-bg-surface-2:  #1a1a1a;
+  --theme-bg-mobile-nav: #1F1D26;
+  --theme-nav:           #000000;
+  --theme-footer:        #111111;
+  --theme-text:          #ffffff;
+  --theme-text-2:        rgba(255, 255, 255, 0.65);
+  --theme-text-muted:    rgba(255, 255, 255, 0.40);
+  --theme-border:        rgba(255, 255, 255, 0.10);
+  --theme-border-mid:    rgba(255, 255, 255, 0.20);
+  --theme-card:          rgba(255, 255, 255, 0.05);
+  --theme-transition:    background-color 0.25s ease, color 0.25s ease,
+                         border-color 0.25s ease;
+}
+
+/* ── Light theme overrides ─────────────────────────────────── */
+html[data-theme="light"] {
+  --theme-bg-page:       #f7f6f3;
+  --theme-bg-surface:    #ffffff;
+  --theme-bg-surface-2:  #f0eeeb;
+  --theme-bg-mobile-nav: #f3f2ef;
+  --theme-nav:           #ffffff;
+  --theme-footer:        #f0eeeb;
+  --theme-text:          #1c1c1c;
+  --theme-text-2:        rgba(28, 28, 28, 0.65);
+  --theme-text-muted:    rgba(28, 28, 28, 0.40);
+  --theme-border:        rgba(0, 0, 0, 0.10);
+  --theme-border-mid:    rgba(0, 0, 0, 0.18);
+  --theme-card:          rgba(0, 0, 0, 0.04);
 }
 
 html, body {
@@ -24,10 +56,11 @@ html, body {
 }
 
 body {
-  @apply bg-eyf-page font-opensans antialiased;
+  @apply font-opensans antialiased;
   color: #64686d;
   line-height: 1.8;
-  background-color: #1c1c1c !important;
+  background-color: var(--theme-bg-page) !important;
+  transition: var(--theme-transition);
 }
 
 a {
@@ -206,4 +239,65 @@ h1, h2, h3, h4, h5, h6 {
   outline: 2px solid #e0be53;
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LIGHT THEME — global Tailwind class overrides.
+   These run after @tailwind utilities and beat Tailwind specificity
+   because html[data-theme="light"] + .class-name = 0,2,0 weight vs the
+   plain 0,1,0 of a single utility class.
+
+   EXCEPTION: .home-hero and [data-theme-static] are excluded so that
+   text over photo backgrounds (which always have dark overlays) stays
+   readable regardless of theme.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Background colours ── */
+html[data-theme="light"] .bg-\[\#111\]          { background-color: var(--theme-bg-surface) !important; }
+html[data-theme="light"] .bg-\[\#1c1c1c\]       { background-color: var(--theme-bg-page)    !important; }
+html[data-theme="light"] .bg-\[\#1a1a1a\]       { background-color: var(--theme-bg-surface) !important; }
+html[data-theme="light"] .bg-eyf-page           { background-color: var(--theme-bg-page)    !important; }
+html[data-theme="light"] .bg-black\/20          { background-color: rgba(0,0,0,0.04)        !important; }
+html[data-theme="light"] .bg-black\/40          { background-color: rgba(0,0,0,0.08)        !important; }
+
+/* White-alpha cards → black-alpha cards */
+html[data-theme="light"] .bg-white\/5           { background-color: rgba(0,0,0,0.04) !important; }
+html[data-theme="light"] .bg-white\/10          { background-color: rgba(0,0,0,0.07) !important; }
+
+/* ── Text colours ── */
+html[data-theme="light"] .text-white { color: var(--theme-text) !important; }
+
+html[data-theme="light"] .text-white\/90  { color: rgba(28,28,28,0.90) !important; }
+html[data-theme="light"] .text-white\/85  { color: rgba(28,28,28,0.85) !important; }
+html[data-theme="light"] .text-white\/65  { color: rgba(28,28,28,0.65) !important; }
+html[data-theme="light"] .text-white\/60  { color: rgba(28,28,28,0.60) !important; }
+html[data-theme="light"] .text-white\/50  { color: rgba(28,28,28,0.50) !important; }
+html[data-theme="light"] .text-white\/40  { color: rgba(28,28,28,0.40) !important; }
+html[data-theme="light"] .text-gray-300   { color: #4a4a4a !important; }
+html[data-theme="light"] .text-gray-300\/85 { color: rgba(40,40,40,0.85) !important; }
+html[data-theme="light"] .text-gray-400   { color: #666666 !important; }
+html[data-theme="light"] .text-gray-500   { color: #777777 !important; }
+/* Keep eyf-gold as-is — looks great on both themes. */
+
+/* ── Borders ── */
+html[data-theme="light"] .border-white\/5  { border-color: rgba(0,0,0,0.06)  !important; }
+html[data-theme="light"] .border-white\/10 { border-color: rgba(0,0,0,0.10)  !important; }
+html[data-theme="light"] .border-white\/20 { border-color: rgba(0,0,0,0.18)  !important; }
+
+/* ── Ring ── */
+html[data-theme="light"] .ring-white\/10  { --tw-ring-color: rgba(0,0,0,0.08) !important; }
+html[data-theme="light"] .ring-white\/20  { --tw-ring-color: rgba(0,0,0,0.14) !important; }
+
+/* ── Shadow adjustments for light bg ── */
+html[data-theme="light"] .shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.18) !important;
+}
+
+/* ── Preserve white text INSIDE the home hero slides (always on dark photo overlay) ── */
+html[data-theme="light"] .home-hero .text-white { color: #ffffff !important; }
+html[data-theme="light"] .home-hero .text-white\/90 { color: rgba(255,255,255,0.90) !important; }
+
+/* ── Smooth body bg transition on theme change ── */
+html[data-theme="light"] body {
+  color: #333333;
 }

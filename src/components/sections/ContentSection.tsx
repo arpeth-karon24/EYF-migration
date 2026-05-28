@@ -19,15 +19,13 @@ export default function ContentSection({
 }: ContentSectionProps) {
   const bgClass =
     backgroundColor === "darker"
-      ? "bg-[#111]"
+      ? "bg-[var(--theme-bg-surface)]"
       : backgroundColor === "light"
-        ? "bg-white"
-        : "bg-[#1c1c1c]";
+        ? "bg-[var(--theme-bg-surface)]"
+        : "bg-[var(--theme-bg-page)]";
 
-  const headingColor =
-    backgroundColor === "light" ? "text-[#2c2c2c]" : "text-white";
-  const textColor =
-    backgroundColor === "light" ? "text-[#64686d]" : "text-gray-300";
+  const headingColor = "text-[var(--theme-text)]";
+  const textColor    = "text-[var(--theme-text-2)]";
   const textAlign = centered ? "text-center" : "";
 
   return (

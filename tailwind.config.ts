@@ -6,14 +6,15 @@ const config: Config = {
     extend: {
       colors: {
         eyf: {
-          page: "#1c1c1c",
-          gold: "#e0be53",
-          footer: "#1f2024",
-          accentBlue: "#0088cc",
-          muted: "#777777",
-          border: "#eee",
-          btnGray: "#444444",
-          btnHover: "#1c1c1c",
+          page:      "var(--theme-bg-page)",     // flips with theme
+          surface:   "var(--theme-bg-surface)",  // flips with theme
+          gold:      "#e0be53",
+          footer:    "#1f2024",
+          accentBlue:"#0088cc",
+          muted:     "#777777",
+          border:    "#eee",
+          btnGray:   "#444444",
+          btnHover:  "#1c1c1c",
         },
       },
       fontFamily: {

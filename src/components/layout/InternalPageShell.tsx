@@ -16,7 +16,7 @@ export function InternalPageShell({
   className = "",
 }: InternalPageShellProps) {
   return (
-    <div className={cn("relative min-h-screen bg-[#111]", className)}>
+    <div className={cn("relative min-h-screen bg-[var(--theme-bg-surface)] transition-colors duration-300", className)}>
       <div className="pointer-events-none fixed inset-0 z-0" aria-hidden>
         <Image
           src={backgroundImage}

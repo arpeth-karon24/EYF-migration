@@ -48,7 +48,7 @@ export default function HeroSection(props: HeroSectionProps) {
           background: "linear-gradient(135deg, #1a3a52 0%, #0f2438 100%)",
         }
       : {
-          background: "#1a1a1a",
+          background: "var(--theme-bg-surface-2)",
         };
 
   return (

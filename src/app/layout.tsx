@@ -3,6 +3,7 @@ import { Inter, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/navbar/SiteHeader";
 import { SiteFooter } from "@/components/footer/SiteFooter";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { GoogleAnalytics } from "@/services/GoogleAnalytics";
 import { JsonLd } from "@/lib/schema/JsonLd";
 import {
@@ -102,6 +103,15 @@ export default function RootLayout({
   return (
     <html lang="en-US" className={`${displayFont.variable} ${accentFont.variable} ${bodyFont.variable}`} suppressHydrationWarning>
       <head>
+        {/* ── No-FOUC theme script ─────────────────────────────────────────────
+            Runs synchronously before paint. Reads localStorage and stamps
+            data-theme on <html> so the page renders in the right theme
+            immediately — no flash of wrong-theme content.                    */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('eyf-theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){}})();`,
+          }}
+        />
         {/* Sitewide Schema.org — Organization + WebSite. Other schemas
             (Event, FAQPage, BlogPosting, etc.) are injected per-page. */}
         <JsonLd id="schema-organization" data={buildOrganizationSchema()} />
@@ -116,13 +126,15 @@ export default function RootLayout({
           Skip to main content
         </a>
         <GoogleAnalytics />
-        <div id="page" className="flex min-h-dvh flex-col">
-          <SiteHeader />
-          <main id="content" className="flex-1">
-            {children}
-          </main>
-          <SiteFooter />
-        </div>
+        <ThemeProvider>
+          <div id="page" className="flex min-h-dvh flex-col">
+            <SiteHeader />
+            <main id="content" className="flex-1">
+              {children}
+            </main>
+            <SiteFooter />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
