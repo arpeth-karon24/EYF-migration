@@ -29,3 +29,5 @@ export {
   supportRequestUserEmail,
   supportRequestAdminEmail,
 } from './supportRequestTemplate';
+
+export { postNotificationEmail } from './postNotificationTemplate';

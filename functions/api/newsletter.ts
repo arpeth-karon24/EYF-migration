@@ -5,7 +5,6 @@
 
 import {
   validateEmailField,
-  sanitizeObject,
   buildValidationErrorResponse,
   buildSuccessResponse,
   buildErrorResponse,
@@ -13,12 +12,16 @@ import {
 import { validateTurnstileToken } from '@/lib/turnstile';
 import { sendBatchEmails } from '@/lib/resend';
 import { newsletterUserEmail, newsletterAdminEmail } from '@/lib/emailTemplates';
+import { subscribeEmail } from '../lib/newsletterSubscribers';
 import { ValidationError } from '@/types/api';
 
 interface Env {
   ADMIN_EMAIL?: string;
   RESEND_API_KEY?: string;
   TURNSTILE_SECRET_KEY?: string;
+  SANITY_WRITE_TOKEN?: string;
+  NEXT_PUBLIC_SANITY_PROJECT_ID?: string;
+  NEXT_PUBLIC_SANITY_DATASET?: string;
 }
 
 interface NewsletterRequest {
@@ -71,6 +74,19 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const email = (body.email || '').toLowerCase().trim();
     const adminEmail = env.ADMIN_EMAIL || 'admin@engage-youth.org';
     const submittedAt = new Date().toLocaleString();
+
+    // ── Persist subscriber in Sanity (idempotent) ──────────────────────
+    const subscribeResult = await subscribeEmail(env, email);
+    if (subscribeResult === 'already_subscribed') {
+      return new Response(
+        JSON.stringify(buildSuccessResponse(
+          "You're already subscribed! We'll keep you updated with our latest news.",
+        )),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+    // 'error' from subscribeEmail is non-fatal — emails still go out, but
+    // we log it so it can be investigated. Don't block the user.
 
     const userEmailHtml = newsletterUserEmail(email);
     const adminEmailHtml = newsletterAdminEmail(email, submittedAt);

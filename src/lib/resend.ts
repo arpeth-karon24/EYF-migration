@@ -64,3 +64,59 @@ export async function sendBatchEmails(
   ]);
   return { user: userResult, admin: adminResult };
 }
+
+/**
+ * Send the same email to many recipients in batches of 100 via
+ * Resend's /emails/batch endpoint.  Returns counts of sent / failed.
+ *
+ * Each call handles up to 100 messages per HTTP request so even large
+ * subscriber lists complete efficiently without hitting rate limits.
+ */
+export async function sendManyEmails(
+  emails: EmailOptions[],
+  apiKey?: string
+): Promise<{ sent: number; failed: number }> {
+  if (!apiKey || emails.length === 0) {
+    return { sent: 0, failed: emails.length };
+  }
+
+  const BATCH = 100;
+  let sent = 0;
+  let failed = 0;
+
+  for (let i = 0; i < emails.length; i += BATCH) {
+    const slice = emails.slice(i, i + BATCH);
+    const body = slice.map((opt) => ({
+      from: opt.from ?? 'onboarding@resend.dev',
+      to: Array.isArray(opt.to) ? opt.to : [opt.to],
+      subject: opt.subject,
+      html: opt.html,
+      ...(opt.replyTo ? { reply_to: opt.replyTo } : {}),
+    }));
+
+    try {
+      const res = await fetch('https://api.resend.com/emails/batch', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (res.ok) {
+        const data = (await res.json()) as { data?: { id: string }[] };
+        sent += data.data?.length ?? slice.length;
+      } else {
+        const err = await res.text().catch(() => '');
+        console.error(`[resend] batch HTTP ${res.status}:`, err);
+        failed += slice.length;
+      }
+    } catch (err) {
+      console.error('[resend] batch send failed:', err);
+      failed += slice.length;
+    }
+  }
+
+  return { sent, failed };
+}
