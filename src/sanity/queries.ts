@@ -184,13 +184,35 @@ export async function getSiteStats(): Promise<SanitySiteStats | null> {
 /**
  * Count of unique volunteer registrations (one doc per unique email).
  * This is the auto-tracked, deduplicated portion of the homepage
- * "Volunteer Number" — added to the manual baseline in siteStats.
+ * "Volunteer Number".
+ *
+ * Returns:
+ *   • number — the actual count (0 means "0 records exist", a real answer)
+ *   • null   — couldn't determine (Sanity not configured, no read token,
+ *              or query errored). The caller should fall back.
+ *
+ * Why the null vs 0 distinction matters:
+ *   The unauthenticated public Sanity API does NOT return
+ *   volunteerRegistration documents — it would always answer 0. So if no
+ *   read token is set, returning 0 would be a lie. We return null instead,
+ *   so HomePage can fall back to siteStats.volunteerCount. Once
+ *   SANITY_API_READ_TOKEN is configured, this returns the true count
+ *   (including 0 when records have been deleted), and the fallback does
+ *   NOT kick in — so deletes correctly reduce the homepage number.
  */
-export async function getVolunteerCount(): Promise<number> {
+export async function getVolunteerCount(): Promise<number | null> {
+  // Without a read token, the public API returns 0 regardless of reality —
+  // explicitly bail so the caller falls back to siteStats.
+  if (!process.env.SANITY_API_READ_TOKEN) return null;
   const client = getSanityClient();
-  if (!client) return 0;
-  const count = await client.fetch<number>(
-    `count(*[_type == "volunteerRegistration"])`
-  );
-  return count ?? 0;
+  if (!client) return null;
+  try {
+    const count = await client.fetch<number>(
+      `count(*[_type == "volunteerRegistration"])`
+    );
+    return count ?? 0;
+  } catch (err) {
+    console.error('[queries] getVolunteerCount failed:', err);
+    return null;
+  }
 }

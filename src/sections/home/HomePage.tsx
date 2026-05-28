@@ -23,12 +23,15 @@ export async function HomePage() {
   //
   // Derived count = single source of truth. When admins delete a record in
   // Sanity Studio, the next rebuild re-derives the count and the homepage
-  // automatically drops by 1 — no separate decrement needed.
+  // automatically drops — no separate decrement needed.
   //
-  // Fallback: if the build has no read token, getVolunteerCount returns 0.
-  // In that case we fall back to siteStats.volunteerCount (maintained by the
-  // /api/volunteer Function on each new registration). This keeps the homepage
-  // showing a reasonable number even if the token isn't configured yet.
+  // Fallback rules:
+  //   • volunteerLive === number (incl. 0) → derived count is trustworthy → use it
+  //   • volunteerLive === null              → couldn't determine (no token /
+  //     query error) → fall back to siteStats.volunteerCount so the homepage
+  //     keeps showing a reasonable number until the token is configured
+  // Crucially, a real 0 from the derived query is RESPECTED — so deletes
+  // actually drop the homepage count instead of being hidden by the fallback.
   const [eventsCount, siteStats, volunteerLive, upcomingEvents] = await Promise.all([
     getAllEventsCount(),
     getSiteStats(),
@@ -37,7 +40,7 @@ export async function HomePage() {
   ]);
 
   const volunteerTotal =
-    volunteerLive > 0 ? volunteerLive : siteStats?.volunteerCount ?? 0;
+    volunteerLive ?? siteStats?.volunteerCount ?? 0;
 
   const stats = [
     {
