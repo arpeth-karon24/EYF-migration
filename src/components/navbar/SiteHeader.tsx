@@ -82,6 +82,17 @@ export function SiteHeader() {
               </li>
               <li className="ml-2">
                 <Link
+                  href="/donation"
+                  className={cn(
+                    "menu_custom_btn inline-flex items-center whitespace-nowrap rounded-[10px] border-0 bg-eyf-gold px-4 py-[7px]",
+                    "text-[13px] font-bold uppercase tracking-wide text-black transition-colors hover:bg-amber-400",
+                  )}
+                >
+                  Donate
+                </Link>
+              </li>
+              <li className="ml-2">
+                <Link
                   href={VOLUNTEER_CTA.href}
                   className={cn(
                     "menu_custom_btn inline-flex items-center whitespace-nowrap rounded-[10px] border-0 bg-[#444444] px-4 py-[7px]",
@@ -146,7 +157,14 @@ export function SiteHeader() {
                 ))}
               </div>
             ))}
-            <div className="pt-6">
+            <div className="pt-6 flex flex-col gap-3">
+              <Link
+                href="/donation"
+                className="block rounded-[10px] bg-eyf-gold py-4 text-center text-xs font-bold uppercase tracking-[0.15em] text-black hover:bg-amber-400"
+                onClick={() => setOpen(false)}
+              >
+                Donate
+              </Link>
               <Link
                 href={VOLUNTEER_CTA.href}
                 className="block rounded-[10px] bg-[#444444] py-4 text-center text-xs font-bold uppercase tracking-[0.15em] text-white hover:bg-[#1c1c1c]"

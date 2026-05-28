@@ -56,31 +56,32 @@ function YoutubeIcon() {
 export function SiteFooter() {
   return (
     <footer id="colophon" className="relative z-10 bg-[#111] text-white" role="contentinfo">
-      <div className="mx-auto max-w-container px-4 py-8">
-        {/* Bottom Bar */}
-        <div className="flex flex-col items-center justify-between gap-6 lg:flex-row lg:gap-0">
-          <div className="text-[13px] font-normal text-white">
-            Copyright © 2024 Engage Youth Foundation
-          </div>
+      {/* Main footer grid */}
+      <div className="mx-auto max-w-container px-4 pt-14 pb-10">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
 
-          <div className="flex flex-col items-center gap-8 lg:flex-row lg:gap-12">
-            <div className="flex gap-8 text-[13px] font-medium text-white">
-              <Link href="/privacy-policy" className="transition-opacity hover:opacity-70">
-                Privacy Policy
-              </Link>
-              <Link href="/contact-us" className="transition-opacity hover:opacity-70">
-                Contact us
-              </Link>
-            </div>
-
-            <div className="flex gap-4">
+          {/* Brand column */}
+          <div className="lg:col-span-2">
+            <p className="mb-1 font-poppins text-[11px] font-bold uppercase tracking-[0.25em] text-eyf-gold">
+              Engage Youth Foundation
+            </p>
+            <p className="mt-3 max-w-sm font-opensans text-[13px] leading-relaxed text-white/65">
+              A 501(c)(3) nonprofit dedicated to engaging, empowering, and mobilizing the next
+              generation. We foster inclusive communities where young minds are heard and actively
+              shape a better tomorrow.
+            </p>
+            <p className="mt-4 font-opensans text-[11px] text-white/40">
+              EIN: <span className="text-white/60">47-4212670</span>
+            </p>
+            {/* Social icons */}
+            <div className="mt-6 flex gap-3">
               {social.map((s) => (
                 <a
                   key={s.label}
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-transform hover:scale-110"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition-all hover:bg-eyf-gold hover:text-black"
                   aria-label={s.label}
                 >
                   {s.icon === "facebook" && <FacebookIcon />}
@@ -90,6 +91,61 @@ export function SiteFooter() {
                 </a>
               ))}
             </div>
+          </div>
+
+          {/* Quick links */}
+          <div>
+            <p className="mb-4 font-poppins text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">
+              Quick links
+            </p>
+            <ul className="space-y-2.5 font-opensans text-[13px] text-white/60">
+              {[
+                { label: "About us", href: "/about-us" },
+                { label: "Events", href: "/events" },
+                { label: "Volunteer with us", href: "/volunteer-with-us" },
+                { label: "Donation", href: "/donation" },
+                { label: "Contact us", href: "/contact-us" },
+                { label: "FAQ", href: "/faq" },
+              ].map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="transition-colors hover:text-white">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Get involved */}
+          <div>
+            <p className="mb-4 font-poppins text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">
+              Get involved
+            </p>
+            <ul className="space-y-2.5 font-opensans text-[13px] text-white/60">
+              {[
+                { label: "Make a donation", href: "/donation" },
+                { label: "In-kind donations", href: "/donation#in-kind" },
+                { label: "Request volunteer support", href: "/request-for-volunteer" },
+                { label: "Privacy policy", href: "/privacy-policy" },
+              ].map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="transition-colors hover:text-white">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="border-t border-white/10">
+        <div className="mx-auto max-w-container px-4 py-5">
+          <div className="flex flex-col items-center justify-between gap-3 text-[12px] text-white/40 sm:flex-row">
+            <span>© {new Date().getFullYear()} Engage Youth Foundation. All rights reserved.</span>
+            <span>501(c)(3) Nonprofit · EIN 47-4212670</span>
           </div>
         </div>
       </div>
