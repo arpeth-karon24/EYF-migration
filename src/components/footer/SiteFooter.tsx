@@ -70,9 +70,7 @@ export function SiteFooter() {
               generation. We foster inclusive communities where young minds are heard and actively
               shape a better tomorrow.
             </p>
-            <p className="mt-4 font-opensans text-[11px] text-white/40">
-              EIN: <span className="text-white/60">47-4212670</span>
-            </p>
+
             {/* Social icons */}
             <div className="mt-6 flex gap-3">
               {social.map((s) => (
@@ -143,9 +141,8 @@ export function SiteFooter() {
       {/* Bottom bar */}
       <div className="border-t" style={{ borderColor: 'var(--theme-border)' }}>
         <div className="mx-auto max-w-container px-4 py-5">
-          <div className="flex flex-col items-center justify-between gap-3 text-[12px] text-white/40 sm:flex-row">
-            <span>© {new Date().getFullYear()} Engage Youth Foundation. All rights reserved.</span>
-            <span>501(c)(3) Nonprofit · EIN 47-4212670</span>
+          <div className="text-center text-[12px] text-white/40">
+            © {new Date().getFullYear()} Engage Youth Foundation. All rights reserved.
           </div>
         </div>
       </div>
