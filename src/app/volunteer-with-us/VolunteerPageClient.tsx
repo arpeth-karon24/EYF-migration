@@ -146,42 +146,64 @@ export default function VolunteerPageClient({ upcomingEvents }: Props) {
         </div>
       </section>
 
-      <section className="border-t border-white/5 bg-black/20 py-14 md:py-20">
+      <section className="border-t border-white/5 bg-black/20 py-16 md:py-24">
         <div className="mx-auto max-w-container px-4">
-          <div className="mx-auto mb-12 max-w-3xl text-center md:mb-16">
-            <h2 className="mb-4 font-poppins text-2xl font-bold text-white md:text-3xl">
+          {/* Section header */}
+          <div className="mx-auto mb-16 max-w-3xl text-center md:mb-24">
+            <p className="mb-3 font-poppins text-xs font-bold uppercase tracking-[0.25em] text-eyf-gold">
+              Our work, your impact
+            </p>
+            <h2 className="mb-4 font-poppins text-3xl font-bold text-white md:text-4xl">
               Where you&apos;ll make a difference
             </h2>
-            <p className="font-opensans text-sm leading-relaxed text-gray-400 md:text-base">
-              Explore a few of the ways volunteers show up for youth and families—and how your strengths can fit into
-              the work we do together.
+            <p className="mx-auto max-w-2xl font-opensans text-base leading-relaxed text-gray-300/85">
+              Explore a few of the ways volunteers show up for youth and families — and how your
+              strengths can fit into the work we do together.
             </p>
           </div>
 
-          <div className="mx-auto flex max-w-3xl flex-col gap-12 md:gap-14">
-            {VOLUNTEER_SPOTLIGHTS.map((item) => (
-              <article
-                key={item.title}
-                className="overflow-hidden rounded-2xl border border-white/10 bg-[#1c1c1c]/80 shadow-xl"
-              >
-                <div className="relative aspect-[16/9] w-full">
-                  <Image
-                    src={item.image}
-                    alt={item.imageAlt}
-                    fill
-                    className="object-cover object-center"
-                    sizes="(max-width: 768px) 100vw, 768px"
-                  />
-                </div>
-                <div className="p-6 md:p-8">
-                  <div className="mb-4 h-1 w-12 bg-eyf-gold" />
-                  <h3 className="mb-3 font-montserrat text-xl font-bold text-white md:text-2xl">{item.title}</h3>
-                  <p className="font-opensans text-[15px] leading-relaxed text-gray-300 md:text-base">
-                    {item.description}
-                  </p>
-                </div>
-              </article>
-            ))}
+          {/* Alternating feature rows — image left/right with copy on the other side */}
+          <div className="mx-auto max-w-6xl space-y-16 md:space-y-24">
+            {VOLUNTEER_SPOTLIGHTS.map((item, idx) => {
+              const reverse = idx % 2 === 1;
+              return (
+                <article
+                  key={item.title}
+                  className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-14"
+                >
+                  {/* Image — flips to the right on alternating rows for desktop */}
+                  <div className={`relative lg:col-span-7 ${reverse ? 'lg:order-2' : ''}`}>
+                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10">
+                      <Image
+                        src={item.image}
+                        alt={item.imageAlt}
+                        fill
+                        className="object-cover object-center transition-transform duration-700 hover:scale-[1.03]"
+                        sizes="(max-width: 1024px) 100vw, 700px"
+                      />
+                      {/* Subtle gradient overlay for depth */}
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-transparent" />
+                    </div>
+                  </div>
+
+                  {/* Copy column */}
+                  <div className={`lg:col-span-5 ${reverse ? 'lg:order-1' : ''}`}>
+                    <div className="mb-5 inline-flex items-center gap-3">
+                      <span className="font-poppins text-xs font-bold uppercase tracking-[0.25em] text-eyf-gold">
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
+                      <span className="h-px w-10 bg-eyf-gold/60" />
+                    </div>
+                    <h3 className="mb-4 font-montserrat text-2xl font-bold leading-tight text-white md:text-3xl">
+                      {item.title}
+                    </h3>
+                    <p className="font-opensans text-[15.5px] leading-[1.7] text-gray-300 md:text-base">
+                      {item.description}
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>

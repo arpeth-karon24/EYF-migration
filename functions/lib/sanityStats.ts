@@ -46,6 +46,40 @@ export function normalizeEmail(email: string): string {
 }
 
 /**
+ * Resolve a Sanity event _id to its human-readable title.
+ * Returns the title on success, null if the id doesn't match an event.
+ *
+ * The volunteer form dropdown uses event._id as the value, so the API
+ * receives an opaque ID (e.g. "1cbe06ab-8fd9-..."). We resolve it to the
+ * actual title so the email confirmation and the saved Sanity record both
+ * show "Beach Cleanliness Drive" instead of a UUID.
+ */
+export async function getEventTitleById(
+  env: VolunteerEnv,
+  rawId: string,
+): Promise<string | null> {
+  if (!rawId) return null;
+  // The form sends "general" for the "General volunteering" option — not an event ID.
+  if (rawId === 'general') return null;
+  const cfg = sanityConfig(env);
+  if (!cfg) return null;
+  // Sanitize the id to safely embed in GROQ (only allow [-_.a-zA-Z0-9]).
+  const safeId = rawId.replace(/[^-_.a-zA-Z0-9]/g, '');
+  if (!safeId) return null;
+  try {
+    const query = `*[_id == "${safeId}"][0].title`;
+    const url = `${cfg.base}/query/${cfg.dataset}?query=${encodeURIComponent(query)}`;
+    const res = await fetch(url, { headers: cfg.headers });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { result?: string | null };
+    return typeof data.result === 'string' && data.result.length > 0 ? data.result : null;
+  } catch (err) {
+    console.error('[stats] getEventTitleById failed:', err);
+    return null;
+  }
+}
+
+/**
  * Deterministic Sanity document ID for a volunteer, derived from the email.
  * Same email → same ID → dedup-safe. Sanity IDs allow [a-zA-Z0-9._-] only.
  */

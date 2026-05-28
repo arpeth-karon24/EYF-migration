@@ -228,7 +228,7 @@ export default async function EventDetailPage({ params }: Props) {
                     href={`/volunteer-with-us/?event=${encodeURIComponent(event._id)}`}
                     className="inline-block rounded-lg bg-eyf-gold px-6 py-3 font-poppins text-sm font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-80"
                   >
-                    Register for this event
+                    Register as volunteer
                   </Link>
                   {event.registrationUrl && (
                     <a

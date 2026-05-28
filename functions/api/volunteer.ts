@@ -21,6 +21,7 @@ import {
   getVolunteerByEmail,
   createVolunteerRecord,
   incrementSiteStatsVolunteerCount,
+  getEventTitleById,
 } from '../lib/sanityStats';
 
 interface Env {
@@ -149,6 +150,20 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       );
     }
 
+    // ── Resolve the event _id from the dropdown to a human-readable title ────
+    // The "Event title" dropdown sends event._id as the value (e.g. a UUID).
+    // Resolve it to the actual event name so emails + the Sanity record show
+    // "Beach Cleanup" instead of an opaque ID. Falls back to a friendly label
+    // for "general" or unresolved IDs.
+    let eventTitleResolved =
+      sanitized.eventTitle === 'general'
+        ? 'General volunteering'
+        : sanitized.eventTitle;
+    if (sanitized.eventTitle && sanitized.eventTitle !== 'general') {
+      const lookedUp = await getEventTitleById(env, sanitized.eventTitle);
+      if (lookedUp) eventTitleResolved = lookedUp;
+    }
+
     // ── Capture the lead FIRST — the record is the source of truth ───────────
     // The volunteer record (not the email) is what the homepage count and the
     // admin's CRM rely on, so it must NOT depend on whether a confirmation
@@ -164,7 +179,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         email: sanitized.email,
         contactNumber: sanitized.contactNumber,
         city: sanitized.city,
-        eventTitle: sanitized.eventTitle,
+        eventTitle: eventTitleResolved,
         availability: sanitized.availability,
         skillsAndInterests: sanitized.skillsAndInterests,
       });
@@ -186,12 +201,15 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const adminEmail = env.ADMIN_EMAIL || 'admin@engage-youth.org';
     const submittedAt = new Date().toLocaleString();
 
-    const userEmailHtml = volunteerRegistrationUserEmail(sanitized.name, sanitized.email, sanitized.eventTitle);
+    // Use the RESOLVED event title (not the raw _id) in both emails so the
+    // user can see which event they registered for and the admin can read it
+    // at a glance instead of decoding a UUID.
+    const userEmailHtml = volunteerRegistrationUserEmail(sanitized.name, sanitized.email, eventTitleResolved);
     const adminEmailHtml = volunteerRegistrationAdminEmail(
       sanitized.name,
       sanitized.email,
       sanitized.contactNumber,
-      sanitized.eventTitle,
+      eventTitleResolved,
       sanitized.city,
       sanitized.availability,
       sanitized.skillsAndInterests,

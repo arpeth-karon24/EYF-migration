@@ -24,8 +24,6 @@ export const metadata: Metadata = {
 };
 
 export default function DonationPage() {
-  const mailto = `mailto:${DONATION_HERO.contactEmail}`;
-
   return (
     <InternalPageShell>
       <JsonLd
@@ -41,14 +39,7 @@ export default function DonationPage() {
       <ContentSection centered className="bg-transparent">
         <div className="mx-auto max-w-3xl text-center">
           <h3 className="mb-4 font-montserrat text-xl font-bold text-white md:text-2xl">Your Donations</h3>
-          <p className="mb-6 font-opensans text-lg leading-relaxed text-gray-200">{DONATION_HERO.intro}</p>
-          <p className="font-opensans leading-relaxed text-gray-400">
-            {DONATION_HERO.chequeNote}{" "}
-            <a href={mailto} className="text-eyf-gold underline-offset-2 hover:underline">
-              {DONATION_HERO.contactEmail}
-            </a>
-            .
-          </p>
+          <p className="font-opensans text-lg leading-relaxed text-gray-200">{DONATION_HERO.intro}</p>
         </div>
       </ContentSection>
 
