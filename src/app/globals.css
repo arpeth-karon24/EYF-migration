@@ -56,8 +56,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .home-hero .swiper,
-.home-hero .swiper-slide {
-  height: var(--eyf-hero-h);
+.home-hero .swiper-slide,
+.home-hero .swiper-wrapper {
+  height: var(--eyf-hero-h) !important;
+  max-height: var(--eyf-hero-h) !important;
 }
 
 .home-hero .swiper-slide {
