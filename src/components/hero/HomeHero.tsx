@@ -52,6 +52,11 @@ export function HomeHero() {
                 className="object-cover object-center"
               />
               <div className="absolute inset-0 bg-black/60 z-[1]" />
+              {/* Bottom fade — gradients the slide image into the page background
+                  (#1c1c1c) so EVERY slide transitions into the stats section
+                  seamlessly, regardless of how dark/bright that particular photo
+                  is at the bottom. Eliminates the "chunky boundary" perception. */}
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-40 bg-gradient-to-t from-[#1c1c1c] via-[#1c1c1c]/70 to-transparent" />
               <div className="relative z-[2] w-full">
                 <div className="mx-auto max-w-container px-4 py-20 lg:py-32">
                   <div className="max-w-4xl animate-fadeInDown">
