@@ -34,7 +34,11 @@ export function HomeHero() {
       >
         {HERO_SLIDES.map((slide, idx) => (
           <SwiperSlide key={`${idx}-${slide.title}`}>
-            <div className="relative flex min-h-[500px] md:min-h-[700px] lg:min-h-[820px] w-full items-center">
+            {/* h-full = fill the .swiper-slide (which is pinned to a fixed height
+                in globals.css). This guarantees the image covers the entire slide
+                area regardless of body-copy length, so no slide leaves a dark gap
+                above the home stats. */}
+            <div className="relative flex h-full w-full items-center">
               {/* Background image — Next.js Image with priority on first slide
                   for fast LCP. Fills the container, covers like background-size:cover. */}
               <Image

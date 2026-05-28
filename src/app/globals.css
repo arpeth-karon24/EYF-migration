@@ -11,9 +11,9 @@
      actual hashed font-family at runtime. These fallback values keep things
      sane during FOUT or if the className fails to apply. The font names
      here MUST match what's loaded in layout.tsx. */
-  --font-poppins: 'Space Grotesk', sans-serif;     /* display */
-  --font-montserrat: 'Inter', sans-serif;          /* accent / subtitles */
-  --font-open-sans: 'Inter', sans-serif;           /* body */
+  --font-poppins: 'Bricolage Grotesque', sans-serif;   /* display */
+  --font-montserrat: 'Inter', sans-serif;              /* accent / subtitles */
+  --font-open-sans: 'Inter', sans-serif;               /* body */
   --swiper-navigation-size: 44px;
   --swiper-theme-color: #007aff;
 }
@@ -43,14 +43,25 @@ h1, h2, h3, h4, h5, h6 {
   @apply font-poppins;
 }
 
-/* Swiper hero — match full-bleed banner height feel */
+/* Swiper hero — full-bleed banner.
+ *
+ * CRITICAL: use `height` (fixed) instead of `min-height` here so EVERY
+ * slide has the same height regardless of its body-copy length. If any
+ * one slide's text overflows min-height, Swiper's wrapper grows to match
+ * the tallest slide and the shorter slides leave a visible dark gap
+ * before the next section. Fixed height + overflow-hidden = uniform.
+ */
 .home-hero .swiper {
   --eyf-hero-h: min(85vh, 820px);
 }
 
 .home-hero .swiper,
 .home-hero .swiper-slide {
-  min-height: var(--eyf-hero-h);
+  height: var(--eyf-hero-h);
+}
+
+.home-hero .swiper-slide {
+  overflow: hidden;
 }
 
 .home-hero .napae-overlay::before {

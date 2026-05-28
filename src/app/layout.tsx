@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/navbar/SiteHeader";
 import { SiteFooter } from "@/components/footer/SiteFooter";
@@ -11,21 +11,22 @@ import {
 } from "@/lib/schema/builders";
 
 // ── Typography refresh ────────────────────────────────────────────────────
-// Modern professional pair:
-//   • Space Grotesk — geometric display, slightly playful, very current
-//     (used by Vercel, Linear, GitHub Next, etc.). Drives headings + hero.
-//   • Inter        — the de-facto modern body font; exceptional readability
-//     and a wide weight range. Drives subtitles, UI, and body copy.
+// Distinctive professional pair:
+//   • Bricolage Grotesque — modern display face with real character
+//     (varied stroke widths, distinctive a / g / r letterforms). Reads as
+//     "intentionally designed" rather than off-the-shelf. Drives headings.
+//   • Inter — the de-facto modern body font; exceptional readability and a
+//     wide weight range. Drives subtitles, UI, and body copy.
 //
 // CSS variable names (--font-poppins, --font-montserrat, --font-open-sans)
 // are preserved so existing `font-poppins / font-montserrat / font-opensans`
 // utility classes across the codebase keep working without a global rename.
 // The CLASS names are legacy; the VALUES they point at are the new fonts.
 
-const displayFont = Space_Grotesk({
+const displayFont = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins", // legacy variable, now backed by Space Grotesk
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-poppins", // legacy variable, now backed by Bricolage Grotesque
   display: "swap",
 });
 
