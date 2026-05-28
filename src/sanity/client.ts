@@ -5,12 +5,21 @@ import type { SanityImage } from './types';
 export function getSanityClient(): SanityClient | null {
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   if (!projectId) return null;
+
+  // Optional build-time read token. When present, the client can read
+  // documents that aren't returned to anonymous requests (notably
+  // volunteerRegistration). Without the token, the client falls back to
+  // unauthenticated reads — events, posts, siteStats, etc. still work.
+  // Set SANITY_API_READ_TOKEN in GitHub Actions secrets to enable.
+  const token = process.env.SANITY_API_READ_TOKEN;
+
   return createClient({
     projectId,
     dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'production',
     apiVersion: '2024-01-01',
     useCdn: false,
     perspective: 'published',
+    ...(token ? { token } : {}),
   });
 }
 

@@ -9,27 +9,35 @@ import {
   getAllEventsCount,
   getUpcomingEvents,
   getSiteStats,
+  getVolunteerCount,
 } from "@/sanity/queries";
 
 export async function HomePage() {
   // Fetch all stat sources in parallel.
-  //   • eventsCount — live count of every event in Sanity
-  //   • siteStats   — singleton holding volunteerCount + volunteerHours
-  //   • upcoming    — for the events carousel further down the page
+  //   • eventsCount    — live count of every event in Sanity
+  //   • siteStats      — singleton holding volunteerCount (fallback) + volunteerHours
+  //   • volunteerLive  — DERIVED count of volunteerRegistration docs (requires
+  //                      SANITY_API_READ_TOKEN at build time, since these docs
+  //                      are not returned to anonymous requests)
+  //   • upcoming       — for the events carousel further down the page
   //
-  // NOTE: the volunteer count comes from siteStats.volunteerCount, NOT from
-  // counting volunteerRegistration docs. The static homepage build queries
-  // Sanity unauthenticated, and the public API does not return
-  // volunteerRegistration documents — but it DOES return siteStats. The
-  // /api/volunteer Function increments siteStats.volunteerCount on each new
-  // (deduped) registration, so this value reflects unique volunteers.
-  const [eventsCount, siteStats, upcomingEvents] = await Promise.all([
+  // Derived count = single source of truth. When admins delete a record in
+  // Sanity Studio, the next rebuild re-derives the count and the homepage
+  // automatically drops by 1 — no separate decrement needed.
+  //
+  // Fallback: if the build has no read token, getVolunteerCount returns 0.
+  // In that case we fall back to siteStats.volunteerCount (maintained by the
+  // /api/volunteer Function on each new registration). This keeps the homepage
+  // showing a reasonable number even if the token isn't configured yet.
+  const [eventsCount, siteStats, volunteerLive, upcomingEvents] = await Promise.all([
     getAllEventsCount(),
     getSiteStats(),
+    getVolunteerCount(),
     getUpcomingEvents(),
   ]);
 
-  const volunteerTotal = siteStats?.volunteerCount ?? 0;
+  const volunteerTotal =
+    volunteerLive > 0 ? volunteerLive : siteStats?.volunteerCount ?? 0;
 
   const stats = [
     {

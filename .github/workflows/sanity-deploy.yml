@@ -36,6 +36,12 @@ jobs:
           # Sanity (content fetching at build time)
           NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
           NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+          # Optional Sanity read token — lets the build read documents that
+          # aren't returned to anonymous requests (notably volunteerRegistration).
+          # When present, the homepage volunteer count is derived directly from
+          # the records, so manual deletes in Sanity Studio reduce the count on
+          # the next rebuild. Falls back to siteStats.volunteerCount if missing.
+          SANITY_API_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
           # Turnstile (CAPTCHA widget on forms — embedded into client bundle)
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
           # Site URL (used by sitemap, robots, metadata)
