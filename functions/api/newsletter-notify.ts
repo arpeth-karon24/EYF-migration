@@ -54,6 +54,7 @@ interface SanityPostPayload {
 }
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+  try {
   const rawBody = await request.text();
 
   // ── 1. Verify Sanity webhook signature ─────────────────────────────────
@@ -155,6 +156,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     JSON.stringify({ ok: true, sent, failed, total: subscribers.length }),
     { status: 200, headers: { 'Content-Type': 'application/json' } },
   );
+  } catch (error) {
+    console.error('[newsletter-notify] Unhandled error:', error);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 };
 
 export const onRequestOptions: PagesFunction = async () =>

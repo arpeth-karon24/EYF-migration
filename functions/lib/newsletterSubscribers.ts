@@ -242,7 +242,7 @@ export async function verifySanitySignature(
   secret: string,
 ): Promise<boolean> {
   try {
-    const parts = signatureHeader.split(',');
+    const parts = signatureHeader.split(',').map((p) => p.trim());
     const t = parts.find((p) => p.startsWith('t='))?.slice(2);
     const v1 = parts.find((p) => p.startsWith('v1='))?.slice(3);
     if (!t || !v1) return false;
