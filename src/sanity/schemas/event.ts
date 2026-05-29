@@ -63,17 +63,14 @@ export const eventSchema = defineType({
     }),
     defineField({
       name: 'status',
-      title: 'Status',
+      title: 'Cancellation Status',
+      description: 'Leave blank for a normal event. Set to "Cancelled" only if the event is called off. Upcoming / Past is determined automatically by the start date.',
       type: 'string',
       options: {
         list: [
-          { title: 'Upcoming', value: 'upcoming' },
-          { title: 'Past', value: 'past' },
           { title: 'Cancelled', value: 'cancelled' },
         ],
       },
-      initialValue: 'upcoming',
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'description',

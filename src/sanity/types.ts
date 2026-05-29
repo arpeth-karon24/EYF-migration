@@ -29,7 +29,8 @@ export interface SanityEvent {
   location: string;
   category?: string;
   eventType?: string;
-  status: 'upcoming' | 'past' | 'cancelled';
+  /** Only set when the event is cancelled. Upcoming/past is derived from startDate. */
+  status?: 'cancelled';
   description?: string;
   mainImage?: SanityImage;
   registrationUrl?: string;

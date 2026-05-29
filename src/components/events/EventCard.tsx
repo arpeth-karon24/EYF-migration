@@ -35,6 +35,9 @@ interface Props {
 export function EventCard({ event }: Props) {
   const imageUrl = event.mainImage ? urlFor(event.mainImage) : null;
   const isCancelled = event.status === "cancelled";
+  // Register button is shown only for non-cancelled events whose start date
+  // hasn't passed yet — determined at render time, not by a manual status field.
+  const isUpcoming = !isCancelled && new Date(event.startDate) > new Date();
 
   return (
     <article
@@ -121,7 +124,7 @@ export function EventCard({ event }: Props) {
             <span className="ml-1">Check back for rescheduling information.</span>
           </div>
         ) : (
-          event.registrationUrl && event.status === "upcoming" && (
+          event.registrationUrl && isUpcoming && (
             <a
               href={event.registrationUrl}
               target="_blank"
@@ -135,7 +138,7 @@ export function EventCard({ event }: Props) {
 
         {/* Read more link — always shown, opens the full event detail page */}
         {event.slug && (
-          <div className={isCancelled || (event.registrationUrl && event.status === "upcoming") ? "pt-1" : ""}>
+          <div className={isCancelled || (event.registrationUrl && isUpcoming) ? "pt-1" : ""}>
             <Link
               href={`/events/${event.slug}/`}
               className="inline-flex items-center gap-1 border-b border-white/20 pb-0.5 font-poppins text-[11px] font-bold uppercase tracking-widest text-white transition-all hover:border-eyf-gold hover:text-eyf-gold"

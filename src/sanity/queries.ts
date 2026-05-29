@@ -73,11 +73,9 @@ export async function getAllPostSlugs(): Promise<string[]> {
 // ─── Events ──────────────────────────────────────────────────────────────────
 
 /**
- * "Upcoming" includes both genuinely upcoming events AND cancelled events
- * whose start date is still in the future. The cancelled ones surface in
- * the same section so visitors who saw the original promotion learn the
- * event is off — preventing the "showed up at the venue" failure mode.
- * EventCard renders them with a clear "CANCELLED" badge.
+ * Upcoming events — startDate is in the future, excluding cancelled.
+ * Used on homepage, volunteer page, and search index where a clean
+ * "what's coming up" list is needed (build-time snapshot via now()).
  */
 export async function getUpcomingEvents(): Promise<SanityEvent[]> {
   const client = getSanityClient();
@@ -86,22 +84,20 @@ export async function getUpcomingEvents(): Promise<SanityEvent[]> {
     return [];
   }
   const results = await client.fetch<SanityEvent[]>(
-    `*[_type == "event" && (status == "upcoming" || (status == "cancelled" && startDate >= now()))] | order(startDate asc) { ${EVENT_FIELDS} }`
+    `*[_type == "event" && startDate >= now() && status != "cancelled"] | order(startDate asc) { ${EVENT_FIELDS} }`
   );
   console.log(`[Sanity] getUpcomingEvents → ${results.length} events found`);
   return results;
 }
 
 /**
- * "Past" includes events explicitly marked `past` AND cancelled events
- * whose start date is already in the past — preserving the historical
- * record that the event was planned (and then cancelled).
+ * Past events — startDate is in the past (all statuses, including cancelled).
  */
 export async function getPastEvents(): Promise<SanityEvent[]> {
   const client = getSanityClient();
   if (!client) return [];
   return client.fetch<SanityEvent[]>(
-    `*[_type == "event" && (status == "past" || (status == "cancelled" && startDate < now()))] | order(startDate desc) { ${EVENT_FIELDS} }`
+    `*[_type == "event" && startDate < now()] | order(startDate desc) { ${EVENT_FIELDS} }`
   );
 }
 
