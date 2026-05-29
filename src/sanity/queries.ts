@@ -105,6 +105,20 @@ export async function getPastEvents(): Promise<SanityEvent[]> {
   );
 }
 
+/**
+ * Fetch ALL events with no date/status filter — used by the events page to
+ * split upcoming vs past client-side based on the visitor's actual current
+ * time (not the build-time snapshot). Sorted ascending so the client-side
+ * split inherits a sensible base order.
+ */
+export async function getAllEvents(): Promise<SanityEvent[]> {
+  const client = getSanityClient();
+  if (!client) return [];
+  return client.fetch<SanityEvent[]>(
+    `*[_type == "event"] | order(startDate asc) { ${EVENT_FIELDS} }`
+  );
+}
+
 export async function getAllEventsCount(): Promise<number | null> {
   const client = getSanityClient();
   if (!client) return null; // null = Sanity not configured, use fallback

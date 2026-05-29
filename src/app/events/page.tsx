@@ -1,10 +1,8 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { InternalPageShell } from '@/components/layout/InternalPageShell';
-import { BlackTitleBar } from '@/components/layout/BlackTitleBar';
-import { HeroSection, ContentSection } from '@/components/sections';
-import { FilterableEventsGrid } from '@/components/events/FilterableEventsGrid';
-import { getUpcomingEvents, getPastEvents } from '@/sanity/queries';
+import { HeroSection } from '@/components/sections';
+import { EventsClientWrapper } from '@/components/events/EventsClientWrapper';
+import { getAllEvents } from '@/sanity/queries';
 import { urlFor } from '@/sanity/client';
 import { JsonLd } from '@/lib/schema/JsonLd';
 import {
@@ -12,6 +10,7 @@ import {
   buildCollectionPageSchema,
   buildBreadcrumbSchema,
 } from '@/lib/schema/builders';
+import { SanityEvent } from '@/sanity/types';
 
 export const metadata: Metadata = {
   title: 'Events',
@@ -21,23 +20,38 @@ export const metadata: Metadata = {
 };
 
 /**
- * Events page — full Events index with two filterable sections:
- *   1. Upcoming events (with "Choose Events" heading)
- *   2. Past events (anchor #past for nav deep-links)
+ * Events page — fetches ALL events once, then passes them to
+ * EventsClientWrapper which splits upcoming / past using the visitor's
+ * actual current date (not the build-time snapshot).
  *
- * Each section gets its own filter form (keywords / location / date /
- * category / event type) that filters that section's events live.
+ * This means an event added with tomorrow's date automatically moves to
+ * "Past Events" once that date passes — no manual status change needed
+ * and no redeploy required.
  */
 export default async function EventsPage() {
-  const [upcomingEvents, pastEvents] = await Promise.all([
-    getUpcomingEvents(),
-    getPastEvents(),
-  ]);
+  const allEvents = await getAllEvents();
+
+  // ── Build-time split ──────────────────────────────────────────────────
+  // Used only for:
+  //   1. The pre-rendered HTML (SEO / no blank flash on first load)
+  //   2. Schema.org JSON-LD event markup
+  // The client component re-computes this with the visitor's real date.
+  const buildNow = new Date();
+
+  function splitAtBuildTime(events: SanityEvent[]) {
+    const upcoming = events
+      .filter((e) => new Date(e.startDate) > buildNow)
+      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+    const past = events
+      .filter((e) => new Date(e.startDate) <= buildNow)
+      .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+    return { upcoming, past };
+  }
+
+  const { upcoming: initialUpcoming, past: initialPast } = splitAtBuildTime(allEvents);
 
   // ── Schema.org ─────────────────────────────────────────────────────────
-  // Inject one Event schema per upcoming event (Google Events carousel
-  // eligibility), plus a CollectionPage + BreadcrumbList for the page itself.
-  const eventSchemas = upcomingEvents.map((event) =>
+  const eventSchemas = initialUpcoming.map((event) =>
     buildEventSchema(event, event.mainImage ? urlFor(event.mainImage) : null),
   );
 
@@ -50,7 +64,7 @@ export default async function EventsPage() {
           description:
             'Upcoming and past community events, workshops, and gatherings organized by Engage Youth Foundation.',
           path: '/events/',
-          itemCount: upcomingEvents.length + pastEvents.length,
+          itemCount: allEvents.length,
         })}
       />
       <JsonLd
@@ -63,40 +77,15 @@ export default async function EventsPage() {
       {eventSchemas.map((schema, i) => (
         <JsonLd key={`schema-event-${i}`} data={schema} />
       ))}
+
       <HeroSection title="Events" variant="internal" className="bg-transparent" />
 
-      {/* ── Upcoming ─────────────────────────────────────────────────── */}
-      <ContentSection centered={false} className="bg-transparent">
-        <div className="mx-auto max-w-5xl">
-          <FilterableEventsGrid
-            events={upcomingEvents}
-            title="Choose Events"
-            emptyStateTitle="There are currently no events."
-            emptyStateBody="Check back soon for upcoming workshops, community projects, and gatherings."
-          />
-        </div>
-      </ContentSection>
-
-      {/* ── Past — anchor #past for nav links ────────────────────────── */}
-      <BlackTitleBar id="past">Past Events</BlackTitleBar>
-
-      <ContentSection centered={pastEvents.length === 0} className="bg-transparent pb-20">
-        <div className="mx-auto max-w-5xl">
-          <FilterableEventsGrid
-            events={pastEvents}
-            emptyStateTitle="No past events yet"
-            emptyStateBody={
-              <>
-                Past event recaps will appear here when available. For the latest updates, visit{' '}
-                <Link href="/news-and-social-media" className="text-eyf-gold underline-offset-2 hover:underline">
-                  News and Social Media
-                </Link>{' '}
-                or subscribe to our newsletter.
-              </>
-            }
-          />
-        </div>
-      </ContentSection>
+      {/* Client wrapper handles date-based split on every visit */}
+      <EventsClientWrapper
+        allEvents={allEvents}
+        initialUpcoming={initialUpcoming}
+        initialPast={initialPast}
+      />
     </InternalPageShell>
   );
 }
