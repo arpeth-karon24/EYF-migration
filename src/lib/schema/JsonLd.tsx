@@ -20,7 +20,6 @@ export function JsonLd({ data, id }: JsonLdProps) {
     <script
       type="application/ld+json"
       id={id}
-      // eslint-disable-next-line react/no-danger -- JSON-LD must be raw HTML
       dangerouslySetInnerHTML={{
         __html: JSON.stringify(data),
       }}

@@ -95,7 +95,7 @@ export default async function EventDetailPage({ params }: Props) {
 
   const imageUrl = event.mainImage ? urlFor(event.mainImage) : null;
   const isCancelled = event.status === "cancelled";
-  const isUpcoming = event.status === "upcoming";
+  const isUpcoming = !isCancelled && new Date(event.startDate) > new Date();
 
   return (
     <InternalPageShell>
