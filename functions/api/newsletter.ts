@@ -18,6 +18,7 @@ import { ValidationError } from '@/types/api';
 interface Env {
   ADMIN_EMAIL?: string;
   RESEND_API_KEY?: string;
+  RESEND_FROM_EMAIL?: string;
   TURNSTILE_SECRET_KEY?: string;
   SANITY_WRITE_TOKEN?: string;
   NEXT_PUBLIC_SANITY_PROJECT_ID?: string;
@@ -73,6 +74,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
     const email = (body.email || '').toLowerCase().trim();
     const adminEmail = env.ADMIN_EMAIL || 'admin@engage-youth.org';
+    const fromEmail = env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
     const submittedAt = new Date().toLocaleString();
 
     // ── Persist subscriber in Sanity (idempotent) ──────────────────────
@@ -93,12 +95,14 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
     const emailResults = await sendBatchEmails(
       {
+        from: fromEmail,
         to: email,
         subject: 'Welcome to Our Newsletter - Engage Youth Foundation',
         html: userEmailHtml,
         replyTo: adminEmail,
       },
       {
+        from: fromEmail,
         to: adminEmail,
         subject: `New Newsletter Subscriber: ${email}`,
         html: adminEmailHtml,

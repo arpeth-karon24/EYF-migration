@@ -20,6 +20,7 @@ import { ValidationError } from '@/types/api';
 interface Env {
   ADMIN_EMAIL?: string;
   RESEND_API_KEY?: string;
+  RESEND_FROM_EMAIL?: string;
   TURNSTILE_SECRET_KEY?: string;
 }
 
@@ -92,6 +93,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
     // Get admin email from environment
     const adminEmail = env.ADMIN_EMAIL || 'admin@engage-youth.org';
+    const fromEmail = env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
     const submittedAt = new Date().toLocaleString();
 
     // Generate email templates
@@ -107,12 +109,14 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     // Send emails
     const emailResults = await sendBatchEmails(
       {
+        from: fromEmail,
         to: sanitized.email,
         subject: 'We Received Your Inquiry - Engage Youth Fund',
         html: userEmailHtml,
         replyTo: adminEmail,
       },
       {
+        from: fromEmail,
         to: adminEmail,
         subject: `New Contact Inquiry: ${sanitized.subject}`,
         html: adminEmailHtml,
