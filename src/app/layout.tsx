@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     template: "%s | Engage Youth Foundation",
   },
   description:
-    "501(c)(3) non-profit engaging, empowering, and mobilizing the next generation through programs, mentorship, and community impact in the Pacific Northwest.",
+    "Non-profit engaging, empowering, and mobilizing the next generation through programs, mentorship, and community impact in the Pacific Northwest.",
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -61,13 +61,23 @@ export const metadata: Metadata = {
     siteName: "Engage Youth Foundation",
     title: "Engage Youth Foundation",
     description:
-      "501(c)(3) non-profit engaging, empowering, and mobilizing the next generation through programs, mentorship, and community impact.",
+      "Non-profit engaging, empowering, and mobilizing the next generation through programs, mentorship, and community impact.",
+    // Default social-share preview. Pages may override with their own image
+    // (e.g. an event or news post uses its own photo). Relative URL is made
+    // absolute automatically via metadataBase above.
+    images: [
+      {
+        url: "/images/home/hero-slide-1.jpeg",
+        alt: "Engage Youth Foundation — empowering the next generation",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Engage Youth Foundation",
     description:
-      "501(c)(3) non-profit engaging, empowering, and mobilizing the next generation.",
+      "Non-profit engaging, empowering, and mobilizing the next generation.",
+    images: ["/images/home/hero-slide-1.jpeg"],
   },
   icons: {
     icon: [

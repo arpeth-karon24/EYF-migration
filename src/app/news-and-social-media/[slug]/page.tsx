@@ -37,10 +37,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const sanityPost = await getPostBySlug(slug);
   if (sanityPost) {
+    // Use the post's own image as the social-share preview when available.
+    const ogImage = sanityPost.mainImage ? urlFor(sanityPost.mainImage) : null;
     return {
       title: `${sanityPost.title} | Engage Youth Foundation`,
       description: sanityPost.excerpt,
       alternates: { canonical: `/news-and-social-media/${sanityPost.slug}` },
+      openGraph: {
+        title: sanityPost.title,
+        description: sanityPost.excerpt,
+        type: "article",
+        ...(ogImage ? { images: [{ url: ogImage, alt: sanityPost.title }] } : {}),
+      },
+      ...(ogImage ? { twitter: { card: "summary_large_image", images: [ogImage] } } : {}),
     };
   }
   const post = getBlogPostBySlug(slug);

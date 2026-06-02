@@ -14,10 +14,10 @@ export const SITE = {
   url: SITE_URL,
   logo: `${SITE_URL}/images/logo/eyf-logo.png`,
   email: "engageyouthfoundation@gmail.com",
-  // 501(c)(3) non-profit, based in Pacific Northwest
+  // Non-profit, based in Pacific Northwest
   foundingDate: "2024",
   description:
-    "501(c)(3) non-profit engaging, empowering, and mobilizing the next generation through programs, mentorship, and community impact in the Pacific Northwest.",
+    "Non-profit engaging, empowering, and mobilizing the next generation through programs, mentorship, and community impact in the Pacific Northwest.",
   // TODO: replace with real social links once known
   sameAs: [
     "https://facebook.com",

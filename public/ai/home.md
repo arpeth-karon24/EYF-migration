@@ -3,7 +3,7 @@
 Source of truth for public copy: https://engage-youth.org/
 
 ## Hero slides
-1. Engage Youth Foundation — 501(c)(3) mission statement.
+1. Engage Youth Foundation — mission statement.
 2. Channelizing freshness to the community — youth engagement and future planning.
 3. Join us and get engaged — volunteer invitation.
 

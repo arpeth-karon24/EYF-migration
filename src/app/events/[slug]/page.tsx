@@ -75,6 +75,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const baseDesc = event.description?.slice(0, 160) ??
     `${event.title} — an event organized by Engage Youth Foundation.`;
 
+  // Use the event's own image as the social-share preview when available,
+  // so a shared event link shows that event's photo instead of the default.
+  const ogImage = event.mainImage ? urlFor(event.mainImage) : null;
+
   return {
     title: event.title,
     description: baseDesc,
@@ -83,7 +87,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: event.title,
       description: baseDesc,
       type: "article",
+      ...(ogImage ? { images: [{ url: ogImage, alt: event.title }] } : {}),
     },
+    ...(ogImage ? { twitter: { card: "summary_large_image", images: [ogImage] } } : {}),
   };
 }
 

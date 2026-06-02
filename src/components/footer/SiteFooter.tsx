@@ -66,7 +66,7 @@ export function SiteFooter() {
               Engage Youth Foundation
             </p>
             <p className="mt-3 max-w-sm font-opensans text-[13px] leading-relaxed text-white/65">
-              A 501(c)(3) nonprofit dedicated to engaging, empowering, and mobilizing the next
+              A nonprofit dedicated to engaging, empowering, and mobilizing the next
               generation. We foster inclusive communities where young minds are heard and actively
               shape a better tomorrow.
             </p>

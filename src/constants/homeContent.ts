@@ -9,7 +9,7 @@ export const HERO_SLIDES = [
   {
     image: "/images/home/hero-slide-1.jpeg",
     title: "Engage Youth Foundation",
-    body: "We are a 501 3(c) non-profit organization, established as a dynamic hub dedicated to engaging, empowering and mobilizing the next generation. Our mission is to foster a vibrant and inclusive community where young minds are not only heard but actively participate in shaping a better tomorrow. Through innovative programs, mentorship initiatives, and collaborative projects, we provide a platform for youth to amplify their voices, develop leadership skills, and engage in meaningful social impact.",
+    body: "We are a non-profit organization, established as a dynamic hub dedicated to engaging, empowering and mobilizing the next generation. Our mission is to foster a vibrant and inclusive community where young minds are not only heard but actively participate in shaping a better tomorrow. Through innovative programs, mentorship initiatives, and collaborative projects, we provide a platform for youth to amplify their voices, develop leadership skills, and engage in meaningful social impact.",
   },
   {
     image: "/images/home/hero-slide-2.jpeg",

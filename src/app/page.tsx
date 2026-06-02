@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   // override the template by providing `absolute`.
   title: { absolute: "Engage Youth Foundation — Empowering Youth, Building Futures" },
   description:
-    "Engage Youth Foundation (EYF) is a 501(c)(3) non-profit empowering the next generation through programs, mentorship, events, and community projects. Volunteer, donate, or join an upcoming event.",
+    "Engage Youth Foundation (EYF) is a non-profit empowering the next generation through programs, mentorship, events, and community projects. Volunteer, donate, or join an upcoming event.",
   alternates: { canonical: "/" },
 };
 

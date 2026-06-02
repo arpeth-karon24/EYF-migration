@@ -4,7 +4,7 @@
 
 ## Organization
 - Name: Engage Youth Foundation
-- Type: US 501(c)(3) nonprofit
+- Type: US non-profit organization
 - Mission: Engage, empower, and mobilize youth through programs, mentorship, and community projects (Pacific Northwest focus).
 
 ## Primary URLs

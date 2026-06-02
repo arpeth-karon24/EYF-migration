@@ -35,7 +35,6 @@ export function buildOrganizationSchema() {
     image: SITE.logo,
     description: SITE.description,
     foundingDate: SITE.foundingDate,
-    nonprofitStatus: "Nonprofit501c3",
     areaServed: {
       "@type": "Place",
       name: "Pacific Northwest, USA",
