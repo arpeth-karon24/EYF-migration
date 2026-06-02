@@ -81,9 +81,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/images/logo/favicon-32x32.png", sizes: "32x32" },
-      { url: "/images/logo/favicon-192x192.png", sizes: "192x192" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/images/logo/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/images/logo/favicon-192x192.png", sizes: "192x192", type: "image/png" },
     ],
+    shortcut: "/favicon.ico",
     apple: "/images/logo/apple-touch-icon.png",
   },
   // RSS feed auto-discovery — feed readers like Feedly, Inoreader, and Apple News
