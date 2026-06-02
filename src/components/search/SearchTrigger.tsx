@@ -43,13 +43,17 @@ export function SearchTrigger() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Open site search"
+        aria-label="Search"
         aria-keyshortcuts={isMac ? "Meta+K" : "Control+K"}
-        className="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[12px] font-medium text-white/60 transition hover:border-white/30 hover:bg-white/10 hover:text-white"
+        className="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[12px] font-medium text-white/75 transition hover:border-white/30 hover:bg-white/10 hover:text-white"
       >
         <Search className="h-3.5 w-3.5" aria-hidden />
-        <span className="hidden font-opensans sm:inline">Search…</span>
-        <kbd className="hidden rounded border border-white/20 bg-black/40 px-1.5 py-0.5 font-mono text-[10px] text-white/40 group-hover:text-white/60 navlg:inline-block">
+        <span className="hidden font-opensans sm:inline">Search</span>
+        {/* Decorative shortcut hint — conveyed programmatically via aria-keyshortcuts */}
+        <kbd
+          aria-hidden
+          className="hidden rounded border border-white/20 bg-black/40 px-1.5 py-0.5 font-mono text-[10px] text-white/70 group-hover:text-white navlg:inline-block"
+        >
           {isMac ? "⌘" : "Ctrl"} K
         </kbd>
       </button>

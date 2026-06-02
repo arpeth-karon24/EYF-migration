@@ -8,17 +8,17 @@
 - Mission: Engage, empower, and mobilize youth through programs, mentorship, and community projects (Pacific Northwest focus).
 
 ## Primary URLs
-- Home: /
-- About: /about-us
-- News & social: /news-and-social-media
-- Donation: /donation
-- Volunteer request: /request-for-volunteer
-- FAQ: /faq
-- Events (upcoming): /activities
-- Past events: /past-events
-- Volunteer with us: /volunteer-with-us
-- Contact: /contact-us
-- Privacy: /privacy-policy
+- [Home](https://engage-youth.org/)
+- [About](https://engage-youth.org/about-us)
+- [News & social](https://engage-youth.org/news-and-social-media)
+- [Donation](https://engage-youth.org/donation)
+- [Volunteer request](https://engage-youth.org/request-for-volunteer)
+- [FAQ](https://engage-youth.org/faq)
+- [Events (upcoming)](https://engage-youth.org/activities)
+- [Past events](https://engage-youth.org/past-events)
+- [Volunteer with us](https://engage-youth.org/volunteer-with-us)
+- [Contact](https://engage-youth.org/contact-us)
+- [Privacy](https://engage-youth.org/privacy-policy)
 
 ## Thematic pillars (homepage)
 - Ecological sustainability
@@ -30,4 +30,4 @@
 - Use the Contact page form for inquiries: /contact-us
 
 ## Technical
-- Stack: Next.js (App Router), TypeScript, Tailwind CSS, GSAP ScrollTrigger, Supabase, Sanity CMS, Cloudinary, Cloudflare Pages/Workers, Turnstile.
+- Stack: Next.js (App Router, static export), TypeScript, Tailwind CSS, GSAP ScrollTrigger, Sanity CMS, Cloudflare Pages/Functions, Resend, Turnstile.

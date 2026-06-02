@@ -3,7 +3,7 @@ import { BLOG_POSTS } from "@/constants/blogContent";
 
 export const dynamic = "force-static";
 
-const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://engage-youth.org").replace(/\/$/, "");
+const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://engage-youth.org").trim().replace(/\/$/, "");
 
 const routes = [
   "/",

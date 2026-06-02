@@ -27,6 +27,7 @@ export function HomeAboutSection() {
           <div className="mt-8">
             <Link
               href={HOME_ABOUT.readMoreHref}
+              aria-label="Read more about Engage Youth Foundation"
               className="inline-flex items-center justify-center rounded-full bg-[#1c1c1c] px-8 py-2.5 text-[11px] font-bold uppercase tracking-widest text-white ring-1 ring-white/10 transition-all hover:bg-[#222]"
             >
               Read more

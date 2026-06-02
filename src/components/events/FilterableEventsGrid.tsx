@@ -159,6 +159,7 @@ export function FilterableEventsGrid({
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
+            aria-label="Filter events by category"
             className="w-full appearance-none rounded-xl border border-white/10 bg-black px-6 py-4 pr-10 text-sm text-white outline-none transition-all focus:border-eyf-gold"
           >
             <option value="">Choose an Event Category</option>
@@ -171,6 +172,7 @@ export function FilterableEventsGrid({
           <select
             value={eventType}
             onChange={(e) => setEventType(e.target.value)}
+            aria-label="Filter events by type"
             className="w-full appearance-none rounded-xl border border-white/10 bg-black px-6 py-4 pr-10 text-sm text-white outline-none transition-all focus:border-eyf-gold"
           >
             <option value="">Choose an Event Type</option>

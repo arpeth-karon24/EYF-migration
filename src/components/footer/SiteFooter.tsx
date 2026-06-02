@@ -96,7 +96,7 @@ export function SiteFooter() {
             <p className="mb-4 font-poppins text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">
               Quick links
             </p>
-            <ul className="space-y-2.5 font-opensans text-[13px] text-white/60">
+            <ul className="space-y-2.5 font-opensans text-[13px] text-white/75">
               {[
                 { label: "About us", href: "/about-us" },
                 { label: "Events", href: "/events" },
@@ -119,7 +119,7 @@ export function SiteFooter() {
             <p className="mb-4 font-poppins text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">
               Get involved
             </p>
-            <ul className="space-y-2.5 font-opensans text-[13px] text-white/60">
+            <ul className="space-y-2.5 font-opensans text-[13px] text-white/75">
               {[
                 { label: "Make a donation", href: "/donation" },
                 { label: "In-kind donations", href: "/donation#in-kind" },
