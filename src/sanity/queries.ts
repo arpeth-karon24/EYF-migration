@@ -28,7 +28,8 @@ const EVENT_FIELDS = `
   status,
   description,
   mainImage,
-  registrationUrl
+  registrationUrl,
+  estimatedHoursPerVolunteer
 `;
 
 const TEAM_FIELDS = `

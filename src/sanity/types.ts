@@ -34,6 +34,8 @@ export interface SanityEvent {
   description?: string;
   mainImage?: SanityImage;
   registrationUrl?: string;
+  /** Hours each volunteer is expected to contribute — drives auto hours tracking. */
+  estimatedHoursPerVolunteer?: number;
 }
 
 export interface SanityTeamMember {

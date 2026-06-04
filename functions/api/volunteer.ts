@@ -21,6 +21,8 @@ import {
   getVolunteerByEmail,
   createVolunteerRecord,
   incrementSiteStatsVolunteerCount,
+  incrementSiteStatsVolunteerHours,
+  getEventEstimatedHours,
   getEventTitleById,
 } from '../lib/sanityStats';
 
@@ -197,6 +199,18 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       await incrementSiteStatsVolunteerCount(env);
     } catch (err) {
       console.error('Failed to bump siteStats volunteerCount:', err);
+    }
+
+    // Bump siteStats.volunteerHours by the registered event's estimate.
+    // Auto-skips when the volunteer chose "General volunteering" (eventTitle
+    // is "general") or when the event has no estimate set (returns 0).
+    try {
+      const hours = await getEventEstimatedHours(env, sanitized.eventTitle);
+      if (hours > 0) {
+        await incrementSiteStatsVolunteerHours(env, hours);
+      }
+    } catch (err) {
+      console.error('Failed to bump siteStats volunteerHours:', err);
     }
 
     const adminEmail = env.ADMIN_EMAIL || 'admin@engage-youth.org';

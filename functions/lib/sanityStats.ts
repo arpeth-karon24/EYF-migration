@@ -176,6 +176,99 @@ export async function incrementSiteStatsVolunteerCount(env: VolunteerEnv): Promi
 }
 
 /**
+ * Bump siteStats.volunteerHours by `hours`. Mirrors
+ * incrementSiteStatsVolunteerCount but operates on volunteerHours and takes
+ * an arbitrary positive amount. Called after a successful registration with
+ * the event's estimatedHoursPerVolunteer. No-op when hours <= 0. Never throws.
+ */
+export async function incrementSiteStatsVolunteerHours(
+  env: VolunteerEnv,
+  hours: number,
+): Promise<boolean> {
+  if (!hours || hours <= 0) return false;
+  const cfg = sanityConfig(env);
+  if (!cfg) {
+    console.warn('[stats] Skipping volunteerHours bump — SANITY_WRITE_TOKEN or PROJECT_ID missing.');
+    return false;
+  }
+
+  try {
+    const findQuery = `*[_type == "siteStats"] | order(_createdAt asc) [0] { _id }`;
+    const findUrl = `${cfg.base}/query/${cfg.dataset}?query=${encodeURIComponent(findQuery)}`;
+    const findRes = await fetch(findUrl, { headers: cfg.headers });
+    if (!findRes.ok) {
+      console.error(`[stats] siteStats lookup HTTP ${findRes.status}`);
+      return false;
+    }
+    const findData = (await findRes.json()) as { result?: { _id?: string } | null };
+    const targetId = findData.result?._id ?? 'siteStats';
+
+    const body = {
+      mutations: [
+        {
+          createIfNotExists: {
+            _id: targetId,
+            _type: 'siteStats',
+            volunteerCount: 0,
+            volunteerHours: 0,
+          },
+        },
+        {
+          patch: {
+            id: targetId,
+            setIfMissing: { volunteerHours: 0 },
+            inc: { volunteerHours: hours },
+            set: { lastUpdated: new Date().toISOString() },
+          },
+        },
+      ],
+    };
+
+    const res = await fetch(`${cfg.base}/mutate/${cfg.dataset}`, {
+      method: 'POST',
+      headers: cfg.headers,
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '<no body>');
+      console.error(`[stats] volunteerHours bump HTTP ${res.status}:`, errText);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('[stats] volunteerHours bump failed:', err);
+    return false;
+  }
+}
+
+/**
+ * Resolve an event's estimatedHoursPerVolunteer by its _id.
+ * Returns 0 for "general", unknown IDs, or any error — so general
+ * volunteering and estimate-less events add no hours.
+ */
+export async function getEventEstimatedHours(
+  env: VolunteerEnv,
+  rawId: string,
+): Promise<number> {
+  if (!rawId || rawId === 'general') return 0;
+  const cfg = sanityConfig(env);
+  if (!cfg) return 0;
+  const safeId = rawId.replace(/[^-_.a-zA-Z0-9]/g, '');
+  if (!safeId) return 0;
+  try {
+    const query = `*[_id == "${safeId}"][0].estimatedHoursPerVolunteer`;
+    const url = `${cfg.base}/query/${cfg.dataset}?query=${encodeURIComponent(query)}`;
+    const res = await fetch(url, { headers: cfg.headers });
+    if (!res.ok) return 0;
+    const data = (await res.json()) as { result?: number | null };
+    return typeof data.result === 'number' && data.result > 0 ? data.result : 0;
+  } catch (err) {
+    console.error('[stats] getEventEstimatedHours failed:', err);
+    return 0;
+  }
+}
+
+/**
  * Check whether a volunteer with this email already exists.
  * Returns:
  *   • true  — a registration with this email exists (duplicate)

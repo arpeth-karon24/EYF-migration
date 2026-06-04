@@ -73,6 +73,15 @@ export const eventSchema = defineType({
       },
     }),
     defineField({
+      name: 'estimatedHoursPerVolunteer',
+      title: 'Estimated hours per volunteer',
+      description:
+        'Hours each volunteer is expected to contribute at this event. When someone registers for this event, the homepage "Volunteer Hours" counter auto-increases by this amount. Leave at 0 to add no hours.',
+      type: 'number',
+      initialValue: 0,
+      validation: (Rule) => Rule.min(0).integer(),
+    }),
+    defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
