@@ -2,13 +2,19 @@
  * Cloudflare Pages Function: POST /api/newsletter-notify
  *
  * Called by a Sanity webhook whenever a "post" document is published.
- * Sends a notification email to every active newsletter subscriber.
+ * Sends a notification email to every active subscriber who was subscribed
+ * at or before the article's publishedAt date (no historical article sends).
+ *
+ * Delivery guarantees:
+ *   • Post-level idempotency via "notificationLog" Sanity doc.
+ *   • Subscriber-level idempotency via "deliveryLog" Sanity docs — already-sent
+ *     addresses are skipped on webhook retries and partial-failure recoveries.
+ *   • Per-subscriber status (pending → sent | failed) is written to Sanity
+ *     so the newsletter-retry endpoint can pick up failures.
  *
  * Security:
  *   • Verifies the Sanity HMAC-SHA256 webhook signature
  *     (header: "sanity-webhook-signature: t=...,v1=...").
- *   • Idempotent — a "notificationLog" Sanity doc prevents duplicate sends
- *     even if the webhook fires or retries multiple times for the same post.
  *
  * Required Cloudflare environment variables:
  *   NEWSLETTER_WEBHOOK_SECRET      — must match the secret set in Sanity
@@ -23,11 +29,14 @@
 import { sendManyEmails } from '@/lib/resend';
 import { postNotificationEmail } from '@/lib/emailTemplates';
 import {
-  getActiveSubscribers,
+  getActiveSubscribersWithDate,
   wasPostNotified,
   markPostNotified,
   generateUnsubscribeToken,
   verifySanitySignature,
+  createPendingDeliveryLogs,
+  updateDeliveryLogs,
+  getSentDeliveryEmails,
 } from '../lib/newsletterSubscribers';
 
 interface Env {
@@ -107,7 +116,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     });
   }
 
-  // ── 3. Idempotency check ────────────────────────────────────────────────
+  // ── 3. Post-level idempotency check ─────────────────────────────────────
   const alreadySent = await wasPostNotified(env, postId);
   if (alreadySent) {
     console.log(`[newsletter-notify] Notification already sent for post ${postId} — skipping.`);
@@ -117,18 +126,45 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     });
   }
 
-  // ── 4. Get subscribers ──────────────────────────────────────────────────
-  const subscribers = await getActiveSubscribers(env);
-  if (subscribers.length === 0) {
-    console.log('[newsletter-notify] No active subscribers — nothing to send.');
-    await markPostNotified(env, postId, 0);
-    return new Response(JSON.stringify({ ok: true, sent: 0 }), {
+  // ── 4. Get subscribers and filter by eligibility ────────────────────────
+  // Only subscribers who existed at or before the article's publish date
+  // receive this notification — no retroactive sends to new subscribers.
+  const publishedAt = payload.publishedAt ?? null;
+  const allSubscribers = await getActiveSubscribersWithDate(env);
+
+  const eligible = allSubscribers.filter((sub) => {
+    if (!sub.subscribedAt || !publishedAt) return true;
+    return new Date(sub.subscribedAt) <= new Date(publishedAt);
+  });
+
+  if (eligible.length === 0) {
+    console.log('[newsletter-notify] No eligible subscribers — nothing to send.');
+    await markPostNotified(env, postId, 0, 0);
+    return new Response(JSON.stringify({ ok: true, sent: 0, eligible: 0 }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
-  // ── 5. Build email list ─────────────────────────────────────────────────
+  // ── 5. Subscriber-level idempotency — skip already delivered ────────────
+  // Handles webhook retries after a partial failure or mid-send crash.
+  const alreadySentEmails = await getSentDeliveryEmails(env, postId);
+  const pending = eligible.filter((sub) => !alreadySentEmails.has(sub.email));
+
+  if (pending.length === 0) {
+    console.log(`[newsletter-notify] All ${eligible.length} eligible subscribers already received post ${postId}.`);
+    await markPostNotified(env, postId, eligible.length, 0);
+    return new Response(JSON.stringify({ ok: true, skipped: 'all_delivered', sent: eligible.length }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // ── 6. Create pending delivery log entries ──────────────────────────────
+  const pendingEmails = pending.map((s) => s.email);
+  await createPendingDeliveryLogs(env, postId, pendingEmails);
+
+  // ── 7. Build email list ─────────────────────────────────────────────────
   const siteUrl = (env.NEXT_PUBLIC_SITE_URL ?? 'https://engage-youth-web.pages.dev').replace(/\/$/, '');
   const postUrl = `${siteUrl}/news-and-social-media/${slugValue}`;
   const excerpt = payload.excerpt ?? payload.bodyExcerpt ?? '';
@@ -136,7 +172,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const fromEmail = env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 
   const emails = await Promise.all(
-    subscribers.map(async (recipientEmail) => {
+    pendingEmails.map(async (recipientEmail) => {
       const token = await generateUnsubscribeToken(recipientEmail, unsubSecret);
       const unsubUrl = `${siteUrl}/api/newsletter-unsubscribe?email=${encodeURIComponent(recipientEmail)}&token=${token}`;
       return {
@@ -148,15 +184,19 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     })
   );
 
-  // ── 6. Send in batches ──────────────────────────────────────────────────
-  const { sent, failed } = await sendManyEmails(emails, env.RESEND_API_KEY);
-  console.log(`[newsletter-notify] post=${postId} sent=${sent} failed=${failed} total=${subscribers.length}`);
+  // ── 8. Send in batches, tracking per-subscriber results ─────────────────
+  const { sent, failed, results } = await sendManyEmails(emails, env.RESEND_API_KEY);
+  console.log(`[newsletter-notify] post=${postId} eligible=${eligible.length} pending=${pending.length} sent=${sent} failed=${failed}`);
 
-  // ── 7. Mark as notified (idempotency guard) ─────────────────────────────
-  await markPostNotified(env, postId, sent);
+  // ── 9. Write per-subscriber delivery status ─────────────────────────────
+  await updateDeliveryLogs(env, postId, results, false);
+
+  // ── 10. Mark post as notified (idempotency guard for future webhook fires) ─
+  const totalSent = sent + alreadySentEmails.size;
+  await markPostNotified(env, postId, totalSent, failed);
 
   return new Response(
-    JSON.stringify({ ok: true, sent, failed, total: subscribers.length }),
+    JSON.stringify({ ok: true, sent, failed, eligible: eligible.length, total: allSubscribers.length }),
     { status: 200, headers: { 'Content-Type': 'application/json' } },
   );
   } catch (error) {

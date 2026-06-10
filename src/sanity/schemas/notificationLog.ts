@@ -31,6 +31,13 @@ export const notificationLogSchema = defineType({
       type: 'datetime',
       readOnly: true,
     }),
+    defineField({
+      name: 'failedCount',
+      title: 'Failed',
+      type: 'number',
+      readOnly: true,
+      description: 'Subscribers that failed to receive this notification. Non-zero means a retry is needed.',
+    }),
   ],
   orderings: [
     {

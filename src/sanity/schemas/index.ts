@@ -5,6 +5,7 @@ import { siteStatsSchema } from './siteStats';
 import { volunteerRegistrationSchema } from './volunteerRegistration';
 import { newsletterSubscriberSchema } from './newsletterSubscriber';
 import { notificationLogSchema } from './notificationLog';
+import { deliveryLogSchema } from './deliveryLog';
 
 export const schemas = [
   postSchema,
@@ -14,4 +15,5 @@ export const schemas = [
   volunteerRegistrationSchema,
   newsletterSubscriberSchema,
   notificationLogSchema,
+  deliveryLogSchema,
 ];
