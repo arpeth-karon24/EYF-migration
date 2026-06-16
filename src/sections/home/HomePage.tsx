@@ -7,7 +7,7 @@ import { HomeKeyActivities } from "@/sections/home/HomeKeyActivities";
 import { NewsletterSection } from "@/components/footer/NewsletterSection";
 import {
   getAllEventsCount,
-  getUpcomingEvents,
+  getAllEvents,
   getSiteStats,
   getVolunteerCount,
 } from "@/sanity/queries";
@@ -19,7 +19,8 @@ export async function HomePage() {
   //   • volunteerLive  — DERIVED count of volunteerRegistration docs (requires
   //                      SANITY_API_READ_TOKEN at build time, since these docs
   //                      are not returned to anonymous requests)
-  //   • upcoming       — for the events carousel further down the page
+  //   • allEvents      — for the events carousel, filtered client-side by the
+  //                      component to show only upcoming (not past/cancelled)
   //
   // Derived count = single source of truth. When admins delete a record in
   // Sanity Studio, the next rebuild re-derives the count and the homepage
@@ -32,11 +33,11 @@ export async function HomePage() {
   //     keeps showing a reasonable number until the token is configured
   // Crucially, a real 0 from the derived query is RESPECTED — so deletes
   // actually drop the homepage count instead of being hidden by the fallback.
-  const [eventsCount, siteStats, volunteerLive, upcomingEvents] = await Promise.all([
+  const [eventsCount, siteStats, volunteerLive, allEvents] = await Promise.all([
     getAllEventsCount(),
     getSiteStats(),
     getVolunteerCount(),
-    getUpcomingEvents(),
+    getAllEvents(),
   ]);
 
   const volunteerTotal =
@@ -72,7 +73,7 @@ export async function HomePage() {
         </div>
       </div>
       <HomeAboutSection />
-      <HomeEventsSection upcomingEvents={upcomingEvents} />
+      <HomeEventsSection allEvents={allEvents} />
       <HomeKeyActivities />
       <NewsletterSection />
     </div>

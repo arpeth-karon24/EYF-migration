@@ -23,10 +23,10 @@ function formatEventDate(start: string, end?: string): string {
 }
 
 interface Props {
-  upcomingEvents: SanityEvent[];
+  allEvents: SanityEvent[];
 }
 
-export function HomeEventsSection({ upcomingEvents }: Props) {
+export function HomeEventsSection({ allEvents }: Props) {
   // ─── Filter state — bound to each form field ────────────────────────────
   const [keywords, setKeywords] = useState("");
   const [location, setLocation] = useState("");
@@ -34,13 +34,18 @@ export function HomeEventsSection({ upcomingEvents }: Props) {
   const [category, setCategory] = useState("");
   const [eventType, setEventType] = useState("");
 
-  // ─── Apply filters reactively whenever a field or upcomingEvents changes ─
+  // ─── Apply filters reactively whenever a field or allEvents changes ─
   const filteredEvents = useMemo(() => {
     const kw = keywords.trim().toLowerCase();
     const loc = location.trim().toLowerCase();
     const dr = dateRange.trim().toLowerCase();
+    const now = new Date();
 
-    return upcomingEvents.filter((event) => {
+    return allEvents.filter((event) => {
+      // Only show upcoming events (not past or cancelled)
+      if (event.status === "cancelled") return false;
+      const eventStart = new Date(event.startDate);
+      if (eventStart < now) return false;
       // Keywords — match title or description (case-insensitive substring)
       if (kw) {
         const haystack = `${event.title} ${event.description ?? ""}`.toLowerCase();
@@ -69,7 +74,7 @@ export function HomeEventsSection({ upcomingEvents }: Props) {
       }
       return true;
     });
-  }, [upcomingEvents, keywords, location, dateRange, category, eventType]);
+  }, [allEvents, keywords, location, dateRange, category, eventType]);
 
   const hasActiveFilters =
     keywords || location || dateRange || category || eventType;
@@ -166,7 +171,7 @@ export function HomeEventsSection({ upcomingEvents }: Props) {
             <div className="mt-4 flex items-center justify-between gap-4 text-[12px] text-white/70">
               <span>
                 Showing <strong className="text-eyf-gold">{filteredEvents.length}</strong> of{" "}
-                <strong className="text-white">{upcomingEvents.length}</strong> events
+                <strong className="text-white">{allEvents.filter((e) => e.status !== "cancelled" && new Date(e.startDate) >= new Date()).length}</strong> events
               </span>
               <button
                 type="button"
