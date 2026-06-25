@@ -23,7 +23,11 @@ export default function DonationForm({ submitButtonText = 'Submit Donation' }: D
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    let { value } = e.target;
+    if (name === 'name') {
+      value = value.replace(/[0-9]/g, '');
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 

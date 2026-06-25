@@ -69,8 +69,14 @@ export default function VolunteerRegistrationForm({ onSuccess, upcomingEvents, i
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value, type } = e.target;
+    const { name, type } = e.target;
+    let { value } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
+    if (name === 'name' || name === 'city') {
+      value = value.replace(/[0-9]/g, '');
+    } else if (name === 'contactNumber') {
+      value = value.replace(/[^0-9+\-\(\)\s]/g, '');
+    }
     setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 

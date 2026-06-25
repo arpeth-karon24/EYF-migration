@@ -22,7 +22,11 @@ export default function ContactForm({
   const [file, setFile] = useState<File | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    let { value } = e.target;
+    if (name === 'name') {
+      value = value.replace(/[0-9]/g, '');
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
