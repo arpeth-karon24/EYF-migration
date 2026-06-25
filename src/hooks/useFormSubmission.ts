@@ -112,7 +112,7 @@ export function useFormSubmission(options: UseFormSubmissionOptions) {
               window.location.hostname === '127.0.0.1');
 
           const friendlyMessage = isLocalDev
-            ? 'Forms only work on the deployed site, not on localhost. Either submit this form on https://engage-youth-web.pages.dev, or run `npx wrangler pages dev out` locally.'
+            ? 'Forms only work on the deployed site, not on localhost. Either submit this form on https://engage-youth.org, or run `npx wrangler pages dev out` locally.'
             : `The form endpoint is not responding correctly (status ${response.status}). Please try again later or contact admin@engage-youth.org.`;
 
           setState({

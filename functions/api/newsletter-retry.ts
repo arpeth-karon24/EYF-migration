@@ -92,7 +92,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     console.log(`[newsletter-retry] post=${postId} retrying ${failures.length} failed deliveries.`);
 
     // ── 4. Build emails ───────────────────────────────────────────────────
-    const siteUrl = (env.NEXT_PUBLIC_SITE_URL ?? 'https://engage-youth-web.pages.dev').replace(/\/$/, '');
+    const siteUrl = (env.NEXT_PUBLIC_SITE_URL ?? 'https://engage-youth-web.pages.dev').trim().replace(/\/$/, '');
     const resolvedTitle = postTitle ?? 'New post from Engage Youth Foundation';
     const resolvedSlug = slug ?? '';
     const postUrl = resolvedSlug

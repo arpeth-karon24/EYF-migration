@@ -20,7 +20,7 @@
 // same module works in both Node-style build environments and Workers.
 export const SITE_URL =
   (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SITE_URL) ||
-  'https://engage-youth-web.pages.dev';
+  'https://engage-youth.org';
 const SUPPORT_EMAIL = 'admin@engage-youth.org';
 const BRAND_NAME = 'Engage Youth Foundation';
 const BRAND_TAGLINE = 'Channelizing Freshness to the Community';
@@ -47,7 +47,7 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
   } = props;
 
   const activeSiteUrl = (siteUrl || SITE_URL).replace(/\/$/, '');
-  const logoUrl = 'https://engage-youth-web.pages.dev/images/logo/eyf-logo.png';
+  const logoUrl = 'https://engage-youth.org/images/logo/eyf-logo.png';
 
   return `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">

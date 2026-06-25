@@ -165,7 +165,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   await createPendingDeliveryLogs(env, postId, pendingEmails);
 
   // ── 7. Build email list ─────────────────────────────────────────────────
-  const siteUrl = (env.NEXT_PUBLIC_SITE_URL ?? 'https://engage-youth-web.pages.dev').replace(/\/$/, '');
+  const siteUrl = (env.NEXT_PUBLIC_SITE_URL ?? 'https://engage-youth-web.pages.dev').trim().replace(/\/$/, '');
   const postUrl = `${siteUrl}/news-and-social-media/${slugValue}`;
   const excerpt = payload.excerpt ?? payload.bodyExcerpt ?? '';
   const unsubSecret = env.NEWSLETTER_UNSUBSCRIBE_SECRET ?? 'fallback-secret';
