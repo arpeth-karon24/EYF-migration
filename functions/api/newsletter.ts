@@ -12,7 +12,7 @@ import {
 import { validateTurnstileToken } from '@/lib/turnstile';
 import { sendBatchEmails } from '@/lib/resend';
 import { newsletterUserEmail, newsletterAdminEmail } from '@/lib/emailTemplates';
-import { subscribeEmail } from '../lib/newsletterSubscribers';
+import { subscribeEmail, generateUnsubscribeToken } from '../lib/newsletterSubscribers';
 import { ValidationError } from '@/types/api';
 
 interface Env {
@@ -23,6 +23,7 @@ interface Env {
   SANITY_WRITE_TOKEN?: string;
   NEXT_PUBLIC_SANITY_PROJECT_ID?: string;
   NEXT_PUBLIC_SANITY_DATASET?: string;
+  NEWSLETTER_UNSUBSCRIBE_SECRET?: string;
 }
 
 interface NewsletterRequest {
@@ -91,7 +92,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     // 'error' from subscribeEmail is non-fatal — emails still go out, but
     // we log it so it can be investigated. Don't block the user.
 
-    const userEmailHtml = newsletterUserEmail(email, siteUrl);
+    const unsubSecret = env.NEWSLETTER_UNSUBSCRIBE_SECRET ?? 'fallback-secret';
+    const token = await generateUnsubscribeToken(email, unsubSecret);
+    const unsubUrl = `${siteUrl.replace(/\/$/, '')}/api/newsletter-unsubscribe?email=${encodeURIComponent(email)}&token=${token}`;
+
+    const userEmailHtml = newsletterUserEmail(email, unsubUrl, siteUrl);
     const adminEmailHtml = newsletterAdminEmail(email, submittedAt, siteUrl);
 
     const emailResults = await sendBatchEmails(

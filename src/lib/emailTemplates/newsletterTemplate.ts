@@ -15,7 +15,7 @@ import {
 /**
  * User confirmation / welcome email.
  */
-export function newsletterUserEmail(email: string, siteUrl?: string): string {
+export function newsletterUserEmail(email: string, unsubscribeUrl: string, siteUrl?: string): string {
   const content = `
     <h2>Welcome to the EYF community 🌱</h2>
     ${createParagraph(
@@ -33,9 +33,16 @@ export function newsletterUserEmail(email: string, siteUrl?: string): string {
     ${createButton('Visit Our Website', siteUrl || SITE_URL)}
 
     ${createParagraph(
-      `You can unsubscribe anytime using the link at the bottom of any newsletter we send.<br><br>Thanks for joining us,<br><strong>The Engage Youth Foundation Team</strong>`,
+      `Thanks for joining us,<br><strong>The Engage Youth Foundation Team</strong>`,
       true
     )}
+
+    <p style="font-size:12px; color:#aaa; text-align:center; margin:16px 0 0 0;">
+      <a href="${unsubscribeUrl}"
+         style="color:#aaa; text-decoration:underline; font-size:12px;">
+        Unsubscribe
+      </a>
+    </p>
   `;
 
   return baseEmailTemplate({
