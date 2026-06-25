@@ -47,7 +47,7 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
   } = props;
 
   const activeSiteUrl = (siteUrl || SITE_URL).replace(/\/$/, '');
-  const logoUrl = `${activeSiteUrl}/images/logo/eyf-logo.png`;
+  const logoUrl = 'https://engage-youth-web.pages.dev/images/logo/eyf-logo.png';
 
   return `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
