@@ -112,7 +112,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
           from: fromEmail,
           to: subscriberEmail,
           subject: `New post: ${resolvedTitle}`,
-          html: postNotificationEmail(resolvedTitle, postUrl, resolvedExcerpt, unsubUrl),
+          html: postNotificationEmail(resolvedTitle, postUrl, resolvedExcerpt, unsubUrl, siteUrl),
         };
       })
     );

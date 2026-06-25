@@ -19,8 +19,10 @@ import {
 export function volunteerRegistrationUserEmail(
   name: string,
   email: string,
-  eventTitle: string
+  eventTitle: string,
+  siteUrl?: string
 ): string {
+  const currentSiteUrl = siteUrl || SITE_URL;
   const content = `
     <h2>Welcome to the EYF volunteer family, ${name} 🤝</h2>
     ${createParagraph(
@@ -35,7 +37,7 @@ export function volunteerRegistrationUserEmail(
     ${createDivider()}
 
     ${createParagraph('Curious about what we do while you wait? Explore our current focus areas:')}
-    ${createButton('Explore Our Work', `${SITE_URL}/about-us/`)}
+    ${createButton('Explore Our Work', `${currentSiteUrl.replace(/\/$/, '')}/about-us/`)}
 
     ${createParagraph(
       `Questions before then? Reach out anytime at <a href="mailto:admin@engage-youth.org">admin@engage-youth.org</a>.<br><br>With gratitude,<br><strong>The Engage Youth Foundation Team</strong>`,
@@ -47,6 +49,7 @@ export function volunteerRegistrationUserEmail(
     content,
     title: 'Welcome to the EYF volunteer team',
     preheader: `Thanks for joining, ${name}. We'll be in touch soon.`,
+    siteUrl,
   });
 }
 
@@ -62,7 +65,8 @@ export function volunteerRegistrationAdminEmail(
   availability: string,
   skills: string,
   motivation: string,
-  submittedAt: string
+  submittedAt: string,
+  siteUrl?: string
 ): string {
   const skillsTrim = skills.length > 200 ? `${skills.substring(0, 200)}…` : skills;
   const motivTrim =
@@ -94,5 +98,6 @@ export function volunteerRegistrationAdminEmail(
     content,
     title: `New volunteer — ${name}`,
     preheader: `New volunteer registration from ${name}`,
+    siteUrl,
   });
 }

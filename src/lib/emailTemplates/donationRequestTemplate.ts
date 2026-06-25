@@ -19,9 +19,11 @@ import {
 export function donationUserEmail(
   name: string,
   email: string,
-  donationType: string
+  donationType: string,
+  siteUrl?: string
 ): string {
   const typeLabel = donationType === 'monetary' ? 'Monetary Donation' : 'In-Kind Donation';
+  const currentSiteUrl = siteUrl || SITE_URL;
 
   const content = `
     <h2>Thank you for your generosity, ${name}</h2>
@@ -35,7 +37,7 @@ export function donationUserEmail(
     ${createDivider()}
 
     ${createParagraph('Want to see the impact of your contribution? Learn about our current focus areas and community work:')}
-    ${createButton('See Our Impact', `${SITE_URL}/about-us/`)}
+    ${createButton('See Our Impact', `${currentSiteUrl.replace(/\/$/, '')}/about-us/`)}
 
     ${createParagraph(
       `Have questions before we connect? Reply to this email or write to <a href="mailto:admin@engage-youth.org">admin@engage-youth.org</a>.<br><br>With heartfelt gratitude,<br><strong>The Engage Youth Foundation Team</strong>`,
@@ -47,6 +49,7 @@ export function donationUserEmail(
     content,
     title: 'Thank you for supporting EYF',
     preheader: `Your ${typeLabel.toLowerCase()} request was received.`,
+    siteUrl,
   });
 }
 
@@ -59,7 +62,8 @@ export function donationAdminEmail(
   donationType: string,
   items: string | undefined,
   notes: string | undefined,
-  submittedAt: string
+  submittedAt: string,
+  siteUrl?: string
 ): string {
   const typeLabel = donationType === 'monetary' ? 'Monetary' : 'In-Kind';
   const itemsTrim = items
@@ -96,5 +100,6 @@ export function donationAdminEmail(
     content,
     title: `New donation request from ${name}`,
     preheader: `${typeLabel} donation request from ${name}`,
+    siteUrl,
   });
 }

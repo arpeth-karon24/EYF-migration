@@ -216,11 +216,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const adminEmail = env.ADMIN_EMAIL || 'admin@engage-youth.org';
     const fromEmail = env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
     const submittedAt = new Date().toLocaleString();
+    const siteUrl = env.NEXT_PUBLIC_SITE_URL || 'https://engage-youth-web.pages.dev';
 
     // Use the RESOLVED event title (not the raw _id) in both emails so the
     // user can see which event they registered for and the admin can read it
     // at a glance instead of decoding a UUID.
-    const userEmailHtml = volunteerRegistrationUserEmail(sanitized.name, sanitized.email, eventTitleResolved);
+    const userEmailHtml = volunteerRegistrationUserEmail(sanitized.name, sanitized.email, eventTitleResolved, siteUrl);
     const adminEmailHtml = volunteerRegistrationAdminEmail(
       sanitized.name,
       sanitized.email,
@@ -230,7 +231,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       sanitized.availability,
       sanitized.skillsAndInterests,
       sanitized.motivation,
-      submittedAt
+      submittedAt,
+      siteUrl
     );
 
     // ── Emails are best-effort notifications, NOT a gate on registration ─────

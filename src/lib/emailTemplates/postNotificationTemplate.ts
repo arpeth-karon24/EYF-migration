@@ -22,6 +22,7 @@ export function postNotificationEmail(
   postUrl: string,
   excerpt: string,
   unsubscribeUrl: string,
+  siteUrl?: string
 ): string {
   const safeTitle = postTitle.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const safeExcerpt = excerpt
@@ -71,5 +72,6 @@ export function postNotificationEmail(
     preheader: safeExcerpt
       ? `${postTitle} — ${safeExcerpt}`
       : `Check out our latest post: ${postTitle}`,
+    siteUrl,
   });
 }

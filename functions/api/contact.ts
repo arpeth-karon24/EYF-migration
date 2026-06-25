@@ -95,15 +95,17 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const adminEmail = env.ADMIN_EMAIL || 'admin@engage-youth.org';
     const fromEmail = env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
     const submittedAt = new Date().toLocaleString();
+    const siteUrl = env.NEXT_PUBLIC_SITE_URL || 'https://engage-youth-web.pages.dev';
 
     // Generate email templates
-    const userEmailHtml = contactInquiryUserEmail(sanitized.name, sanitized.email);
+    const userEmailHtml = contactInquiryUserEmail(sanitized.name, sanitized.email, siteUrl);
     const adminEmailHtml = contactInquiryAdminEmail(
       sanitized.name,
       sanitized.email,
       sanitized.subject,
       sanitized.message,
-      submittedAt
+      submittedAt,
+      siteUrl
     );
 
     // Send emails

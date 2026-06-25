@@ -72,10 +72,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       });
     }
 
-    const email = (body.email || '').toLowerCase().trim();
+        const email = (body.email || '').toLowerCase().trim();
     const adminEmail = env.ADMIN_EMAIL || 'admin@engage-youth.org';
     const fromEmail = env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
     const submittedAt = new Date().toLocaleString();
+    const siteUrl = env.NEXT_PUBLIC_SITE_URL || 'https://engage-youth-web.pages.dev';
 
     // ── Persist subscriber in Sanity (idempotent) ──────────────────────
     const subscribeResult = await subscribeEmail(env, email);
@@ -90,8 +91,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     // 'error' from subscribeEmail is non-fatal — emails still go out, but
     // we log it so it can be investigated. Don't block the user.
 
-    const userEmailHtml = newsletterUserEmail(email);
-    const adminEmailHtml = newsletterAdminEmail(email, submittedAt);
+    const userEmailHtml = newsletterUserEmail(email, siteUrl);
+    const adminEmailHtml = newsletterAdminEmail(email, submittedAt, siteUrl);
 
     const emailResults = await sendBatchEmails(
       {

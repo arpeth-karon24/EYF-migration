@@ -179,7 +179,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         from: fromEmail,
         to: recipientEmail,
         subject: `New post: ${postTitle}`,
-        html: postNotificationEmail(postTitle, postUrl, excerpt, unsubUrl),
+        html: postNotificationEmail(postTitle, postUrl, excerpt, unsubUrl, siteUrl),
       };
     })
   );

@@ -119,8 +119,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const adminEmail = env.ADMIN_EMAIL || 'admin@engage-youth.org';
     const fromEmail = env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
     const submittedAt = new Date().toLocaleString();
+    const siteUrl = env.NEXT_PUBLIC_SITE_URL || 'https://engage-youth-web.pages.dev';
 
-    const userEmailHtml = supportRequestUserEmail(sanitized.name, sanitized.email, sanitized.date);
+    const userEmailHtml = supportRequestUserEmail(sanitized.name, sanitized.email, sanitized.date, siteUrl);
     const adminEmailHtml = supportRequestAdminEmail(
       sanitized.name,
       sanitized.email,
@@ -130,7 +131,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       sanitized.location,
       volunteersNeeded,
       sanitized.eventDescription,
-      submittedAt
+      submittedAt,
+      siteUrl
     );
 
     const emailResults = await sendBatchEmails(

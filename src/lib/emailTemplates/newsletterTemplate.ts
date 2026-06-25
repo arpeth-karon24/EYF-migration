@@ -15,7 +15,7 @@ import {
 /**
  * User confirmation / welcome email.
  */
-export function newsletterUserEmail(email: string): string {
+export function newsletterUserEmail(email: string, siteUrl?: string): string {
   const content = `
     <h2>Welcome to the EYF community 🌱</h2>
     ${createParagraph(
@@ -30,7 +30,7 @@ export function newsletterUserEmail(email: string): string {
     ${createDivider()}
 
     ${createParagraph('Want to start exploring now?')}
-    ${createButton('Visit Our Website', SITE_URL)}
+    ${createButton('Visit Our Website', siteUrl || SITE_URL)}
 
     ${createParagraph(
       `You can unsubscribe anytime using the link at the bottom of any newsletter we send.<br><br>Thanks for joining us,<br><strong>The Engage Youth Foundation Team</strong>`,
@@ -41,14 +41,15 @@ export function newsletterUserEmail(email: string): string {
   return baseEmailTemplate({
     content,
     title: 'Welcome to the EYF newsletter',
-    preheader: 'Thanks for subscribing — here\'s what to expect.',
+    preheader: "Thanks for subscribing — here's what to expect.",
+    siteUrl,
   });
 }
 
 /**
  * Admin notification email — sent to the EYF inbox.
  */
-export function newsletterAdminEmail(email: string, submittedAt: string): string {
+export function newsletterAdminEmail(email: string, submittedAt: string, siteUrl?: string): string {
   const content = `
     <h2>New newsletter subscriber</h2>
     ${createParagraph('A new visitor has joined the newsletter list.')}
@@ -63,5 +64,6 @@ export function newsletterAdminEmail(email: string, submittedAt: string): string
     content,
     title: 'New newsletter subscriber',
     preheader: `New subscriber: ${email}`,
+    siteUrl,
   });
 }

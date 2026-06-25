@@ -16,7 +16,7 @@ import {
 /**
  * User confirmation email — sent to the person who filled the form.
  */
-export function contactInquiryUserEmail(name: string, email: string): string {
+export function contactInquiryUserEmail(name: string, email: string, siteUrl?: string): string {
   const content = `
     <h2>Thank you for reaching out, ${name}</h2>
     ${createParagraph(`We've received your message and a member of the Engage Youth Foundation team will get back to you within 1–2 business days.`)}
@@ -28,7 +28,7 @@ export function contactInquiryUserEmail(name: string, email: string): string {
     ${createDivider()}
 
     ${createParagraph('In the meantime, feel free to explore our work or get involved:')}
-    ${createButton('Visit Our Website', SITE_URL)}
+    ${createButton('Visit Our Website', siteUrl || SITE_URL)}
 
     ${createParagraph(
       `If you have anything else to add, just reply to this email — it goes straight to our team.<br><br>Warm regards,<br><strong>The Engage Youth Foundation Team</strong>`,
@@ -40,6 +40,7 @@ export function contactInquiryUserEmail(name: string, email: string): string {
     content,
     title: 'We received your message',
     preheader: `Thanks ${name} — we'll be in touch shortly.`,
+    siteUrl,
   });
 }
 
@@ -51,7 +52,8 @@ export function contactInquiryAdminEmail(
   email: string,
   subject: string,
   message: string,
-  submittedAt: string
+  submittedAt: string,
+  siteUrl?: string
 ): string {
   const truncated = message.length > 500 ? `${message.substring(0, 500)}…` : message;
 
@@ -77,5 +79,6 @@ export function contactInquiryAdminEmail(
     content,
     title: `New inquiry — ${subject}`,
     preheader: `New contact inquiry from ${name}`,
+    siteUrl,
   });
 }

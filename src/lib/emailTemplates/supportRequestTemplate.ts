@@ -17,7 +17,8 @@ import {
 export function supportRequestUserEmail(
   name: string,
   email: string,
-  eventDate: string
+  eventDate: string,
+  siteUrl?: string
 ): string {
   const content = `
     <h2>Your support request was received, ${name}</h2>
@@ -42,6 +43,7 @@ export function supportRequestUserEmail(
     content,
     title: 'Support request received',
     preheader: `Thanks ${name} — we'll respond within 1–2 business days.`,
+    siteUrl,
   });
 }
 
@@ -57,7 +59,8 @@ export function supportRequestAdminEmail(
   location: string,
   volunteersNeeded: number,
   eventDescription: string,
-  submittedAt: string
+  submittedAt: string,
+  siteUrl?: string
 ): string {
   const descTrim =
     eventDescription.length > 400
@@ -90,5 +93,6 @@ export function supportRequestAdminEmail(
     content,
     title: `Support request from ${name}`,
     preheader: `Support request from ${name} — ${date}`,
+    siteUrl,
   });
 }

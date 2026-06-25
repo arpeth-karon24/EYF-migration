@@ -21,29 +21,33 @@
 export const SITE_URL =
   (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SITE_URL) ||
   'https://engage-youth-web.pages.dev';
-const LOGO_URL = `${SITE_URL.replace(/\/$/, '')}/images/logo/eyf-logo.png`;
 const SUPPORT_EMAIL = 'admin@engage-youth.org';
 const BRAND_NAME = 'Engage Youth Foundation';
 const BRAND_TAGLINE = 'Channelizing Freshness to the Community';
-const COPYRIGHT_YEAR = new Date().getFullYear();
 
 export interface EmailTemplateProps {
   content: string;
   title?: string;
   preheader?: string;
   footerText?: string;
+  siteUrl?: string;
 }
 
 /**
  * Generate the full HTML email document.
  */
 export function baseEmailTemplate(props: EmailTemplateProps): string {
+  const currentYear = new Date().getFullYear();
   const {
     content,
     title = BRAND_NAME,
     preheader = '',
-    footerText = `© ${COPYRIGHT_YEAR} ${BRAND_NAME}. All rights reserved.`,
+    footerText = `© ${currentYear} ${BRAND_NAME}. All rights reserved.`,
+    siteUrl,
   } = props;
+
+  const activeSiteUrl = (siteUrl || SITE_URL).replace(/\/$/, '');
+  const logoUrl = `${activeSiteUrl}/images/logo/eyf-logo.png`;
 
   return `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -200,7 +204,7 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
                   <td valign="middle" width="280" class="header-logo-cell" style="width:280px;">
-                    <img src="${LOGO_URL}"
+                    <img src="${logoUrl}"
                          alt="${BRAND_NAME} — ${BRAND_TAGLINE}"
                          width="260"
                          class="header-logo"
@@ -231,11 +235,11 @@ export function baseEmailTemplate(props: EmailTemplateProps): string {
             <td bgcolor="#1f2024" style="background-color:#1f2024; padding: 28px 36px;" class="px" align="center">
               <p class="footer-text" style="margin-bottom:10px;">${escapeHtml(footerText)}</p>
               <p class="footer-text">
-                <a class="footer-link" href="${SITE_URL}" style="color:#e0be53;">Website</a>
+                <a class="footer-link" href="${activeSiteUrl}" style="color:#e0be53;">Website</a>
                 &nbsp;·&nbsp;
                 <a class="footer-link" href="mailto:${SUPPORT_EMAIL}" style="color:#e0be53;">Contact</a>
                 &nbsp;·&nbsp;
-                <a class="footer-link" href="${SITE_URL}/privacy-policy" style="color:#e0be53;">Privacy</a>
+                <a class="footer-link" href="${activeSiteUrl}/privacy-policy" style="color:#e0be53;">Privacy</a>
               </p>
               <p class="footer-text" style="margin-top:14px; color:#7d8290;">
                 You're receiving this because you interacted with ${BRAND_NAME} on our website.
