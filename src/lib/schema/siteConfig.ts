@@ -13,6 +13,7 @@ export const SITE = {
   alternateName: "EYF",
   url: SITE_URL,
   logo: `${SITE_URL}/images/logo/eyf-logo.png`,
+  logoSquare: `${SITE_URL}/images/logo/eyf-logo-square.png`,
   email: "engageyouthfoundation@gmail.com",
   // Non-profit, based in Pacific Northwest
   foundingDate: "2024",

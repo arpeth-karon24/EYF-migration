@@ -67,6 +67,12 @@ export const metadata: Metadata = {
     // absolute automatically via metadataBase above.
     images: [
       {
+        url: "/images/logo/eyf-logo-square.png",
+        width: 512,
+        height: 512,
+        alt: "Engage Youth Foundation logo",
+      },
+      {
         url: "/images/home/hero-slide-1.jpeg",
         alt: "Engage Youth Foundation — empowering the next generation",
       },
@@ -77,7 +83,7 @@ export const metadata: Metadata = {
     title: "Engage Youth Foundation",
     description:
       "Non-profit engaging, empowering, and mobilizing the next generation.",
-    images: ["/images/home/hero-slide-1.jpeg"],
+    images: ["/images/logo/eyf-logo-square.png"],
   },
   icons: {
     icon: [
@@ -86,7 +92,9 @@ export const metadata: Metadata = {
       { url: "/images/logo/favicon-192x192.png", sizes: "192x192", type: "image/png" },
     ],
     shortcut: "/favicon.ico",
-    apple: "/images/logo/apple-touch-icon.png",
+    apple: [
+      { url: "/images/logo/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   // RSS feed auto-discovery — feed readers like Feedly, Inoreader, and Apple News
   // pick up this hint and offer one-click subscription.

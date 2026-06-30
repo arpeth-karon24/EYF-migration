@@ -26,13 +26,21 @@ export function buildOrganizationSchema() {
     legalName: SITE.legalName,
     alternateName: SITE.alternateName,
     url: SITE.url,
-    logo: {
-      "@type": "ImageObject",
-      url: SITE.logo,
-      width: 900,
-      height: 320,
-    },
-    image: SITE.logo,
+    logo: [
+      {
+        "@type": "ImageObject",
+        url: SITE.logoSquare,
+        width: 512,
+        height: 512,
+      },
+      {
+        "@type": "ImageObject",
+        url: SITE.logo,
+        width: 512,
+        height: 180,
+      },
+    ],
+    image: SITE.logoSquare,
     description: SITE.description,
     foundingDate: SITE.foundingDate,
     areaServed: {
