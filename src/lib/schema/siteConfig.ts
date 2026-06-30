@@ -19,13 +19,9 @@ export const SITE = {
   foundingDate: "2024",
   description:
     "Non-profit engaging, empowering, and mobilizing the next generation through programs, mentorship, and community impact in the Pacific Northwest.",
-  // TODO: replace with real social links once known
-  sameAs: [
-    "https://facebook.com",
-    "https://linkedin.com",
-    "https://instagram.com",
-    "https://youtube.com",
-  ],
+  // Social media links — populate these once accounts are created
+  // Examples: https://facebook.com/EngageYouthFoundation, https://linkedin.com/company/engage-youth-foundation
+  sameAs: [],
 } as const;
 
 /** Build an absolute URL from a site-relative path. */

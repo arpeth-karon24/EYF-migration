@@ -8,7 +8,17 @@ const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://engage-youth.org").tr
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: "*", allow: "/" }],
+    rules: [
+      // Allow all crawlers by default
+      { userAgent: "*", allow: "/" },
+      // Explicitly allow AI crawlers to index for search summaries
+      { userAgent: "GPTBot", allow: "/" },
+      { userAgent: "CCBot", allow: "/" },
+      { userAgent: "ClaudeBot", allow: "/" },
+      { userAgent: "PerplexityBot", allow: "/" },
+      { userAgent: "Amazonbot", allow: "/" },
+      { userAgent: "Applebot-Extended", allow: "/" },
+    ],
     sitemap: `${base}/sitemap.xml`,
     host: base,
   };
