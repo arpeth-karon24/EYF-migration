@@ -62,13 +62,15 @@ export function SiteHeader() {
                     )}
                   </Link>
                   {item.children && item.children.length > 0 && (
-                    <ul className="invisible absolute right-0 top-full z-50 min-w-[260px] border bg-[var(--theme-nav)] py-1 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100" style={{ borderColor: 'var(--theme-border)' }}>
+                    <ul
+                      className="invisible absolute right-0 top-full z-50 min-w-[280px] translate-y-2 rounded-xl border bg-[var(--theme-nav)] p-2 opacity-0 shadow-2xl transition-all duration-200 ease-out group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100"
+                      style={{ borderColor: 'var(--theme-border)' }}
+                    >
                       {item.children.map((c) => (
                         <li key={c.href + c.label}>
                           <Link
                             href={c.href}
-                            className="block border-b px-4 py-2 text-xs uppercase tracking-wider text-[var(--theme-text)] transition-colors hover:bg-[var(--theme-card)]"
-                            style={{ borderColor: 'var(--theme-border)' }}
+                            className="block rounded-lg px-4 py-3 text-xs uppercase tracking-wider text-[var(--theme-text-2)] transition-colors duration-200 hover:bg-[var(--theme-card)] hover:text-[var(--theme-text)]"
                           >
                             {c.label}
                           </Link>
@@ -129,10 +131,10 @@ export function SiteHeader() {
         >
           <div className="px-4 pb-10 pt-4">
             {PRIMARY_NAV.map((item) => (
-              <div key={item.label} className="border-b last:border-0" style={{ borderColor: 'var(--theme-border)' }}>
+              <div key={item.label} className="py-1">
                 <Link
                   href={item.href}
-                  className="block py-4 text-sm font-semibold uppercase tracking-widest text-[var(--theme-text-2)] hover:text-[var(--theme-text)]"
+                  className="block rounded-lg px-3 py-3.5 text-sm font-semibold uppercase tracking-widest text-[var(--theme-text-2)] transition-colors duration-200 hover:bg-[var(--theme-card)] hover:text-[var(--theme-text)]"
                   onClick={() => setOpen(false)}
                 >
                   {item.label}
@@ -141,8 +143,7 @@ export function SiteHeader() {
                   <Link
                     key={c.href}
                     href={c.href}
-                    className="block border-t py-3 pl-6 text-xs uppercase tracking-widest text-[var(--theme-text-2)] opacity-80 hover:opacity-100 hover:text-[var(--theme-text)]"
-                    style={{ borderColor: 'var(--theme-border)' }}
+                    className="block rounded-lg py-3 pl-8 pr-3 text-xs uppercase tracking-widest text-[var(--theme-text-2)] transition-colors duration-200 hover:bg-[var(--theme-card)] hover:text-[var(--theme-text)]"
                     onClick={() => setOpen(false)}
                   >
                     {c.label}
